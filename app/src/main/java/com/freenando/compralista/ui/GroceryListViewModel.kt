@@ -44,9 +44,11 @@ class GroceryListViewModel(private val entriesRepository: EntriesRepository) : V
                 .execute();
             if (response.data != null
                 && response.data!!.product != null
-                && !uiState.value.productAlreadyAdded(response.data!!.product?.productId!!)
             ) {
-                saveEntry(ProductEntry(response.data!!.product!!))
+                if ( uiState.value.productAlreadyAdded(response.data!!.product?.productId!!) )
+                    toggleAddedToCart(response.data!!.product?.productId!!)
+                else
+                    saveEntry(ProductEntry(response.data!!.product!!))
                 _appInfo.update { AppInfo.AWAITING_INPUT }
                 // stateIsLoading.update { false }
             } else {
