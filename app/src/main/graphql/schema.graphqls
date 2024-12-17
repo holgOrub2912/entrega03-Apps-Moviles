@@ -1,0 +1,639 @@
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+  SEGMENT
+}
+
+directive @translatableV2(
+    behavior: String
+) on FIELD_DEFINITION
+
+directive @context(
+    provider: String
+) on FIELD
+
+directive @cacheControl(
+  maxAge: Int
+  scope: CacheControlScope
+  inheritMaxAge: Boolean
+) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+directive @withSegment on FIELD_DEFINITION
+
+directive @toVtexAssets on FIELD_DEFINITION
+
+enum SORT {
+  ASC
+  DESC
+}
+
+type Query {
+  """
+  Returns a specified product
+  """
+  product(
+    """
+    Product slug
+    """
+    slug: String
+    """
+    Product identifier
+    """
+    identifier: ProductUniqueIdentifier
+    """
+    Seller id encoded with base64 according to this format SW#{sellerId}
+    """
+    regionId: String
+    """
+    Trade Policy
+    """
+    salesChannel: Int
+  ): Product @cacheControl(scope: SEGMENT, maxAge: 0) @withSegment
+
+  """
+  Lists the banners registered for a given query. Check the [configuring banners documentation](https://help.vtex.com/en/tracks/vtex-intelligent-search--19wrbB7nEQcmwzDPl1l4Cb/4ViKEivLJtJsvpaW0aqIQ5) for a full explanation of the banner feature.
+  """
+  banners(
+    """
+    Search term. It can contain any character.
+    """
+    fullText: String = ""
+    """
+    List of the selected facets
+
+    The order in which the terms appear is not relevant to the search.
+
+    You can also repeat the same `facetKey` several times for different values.
+    """
+    selectedFacets: [SelectedFacetInput]
+  ): Banners @cacheControl(scope: SEGMENT, maxAge: 0) @withSegment
+
+  """
+  Tries to correct a misspelled term from the search.
+  """
+  correction(
+    """
+    Search term. It can contain any character.
+    """
+    fullText: String = ""
+  ): Correction @cacheControl(scope: SEGMENT, maxAge: 0) @withSegment
+
+  """
+  Lists suggested terms similar to the search term.
+  """
+  searchSuggestions(
+    """
+    Search term. It can contain any character.
+    """
+    fullText: String!
+    """
+    As fuzzy and operator, it controls the search state, but it is for general purposes. This field allows the search engines to apply features that are not handled by the other fields.
+    The possible values in this field are defined by each search engine.
+    """
+    searchState: String
+  ): SearchSuggestions
+    @cacheControl(scope: SEGMENT, maxAge: 1)
+    @withSegment
+
+  """
+  Lists the products for a given query.
+  """
+  productSearch(
+    """
+    **Deprecated**. Use `fullText` instead.
+    """
+    query: String = ""
+    """
+    Search term. It can contain any character.
+    """
+    fullText: String = ""
+    """
+    **Deprecated**. Use `selectedFacets` instead.
+    """
+    map: String = ""
+    """
+    List of the selected facets
+
+    The order in which the terms appear is not relevant to the search.
+
+    You can also repeat the same `facetKey` several times for different values.
+    """
+    selectedFacets: [SelectedFacetInput]
+    """
+    **Deprecated**. Use `selectedFacets` instead.
+    """
+    category: String = ""
+    """
+    **Deprecated**. Use `selectedFacets` instead.
+    """
+    specificationFilters: [String]
+    """
+    Filter by price range. e.g.: {a} TO {b} - {a} is the minimum price "from" and {b} is the highest price "to"
+    """
+    priceRange: String = ""
+    """
+    **Deprecated**. Use `selectedFacets` instead.
+    """
+    collection: String = ""
+    """
+    Filter by availability at a specific sales channel. e.g.: salesChannel:4 if want filter by available products for the sales channel 4
+    """
+    salesChannel: String = ""
+    """
+    Order by a criteria. OrderByPriceDESC/OrderByPriceASC, OrderByTopSaleDESC, OrderByReviewRateDESC, OrderByNameASC/OrderByNameDESC, OrderByReleaseDateDESC, OrderByBestDiscountDESC, OrderByScoreDESC
+    If you want to sort by a specification, use the format {specification key}:{asc|desc}. For example: 'pricePerUnit:asc' or 'size:desc' (this only works on `vtex.search-resolver@1.x`)
+    """
+    orderBy: String = "OrderByScoreDESC"
+    """
+    Pagination item start
+    """
+    from: Int = 0
+    """
+    Pagination item end
+    """
+    to: Int = 9
+    """
+    If true, uses isAvailablePerSalesChannel_ parameter on query with segment's sales channel. Will override any given salesChannel arg
+    """
+    hideUnavailableItems: Boolean = false
+    """
+    If you want faster searches and do not care about most up to date prices and promotions, use skip value.
+    """
+    simulationBehavior: SimulationBehavior = default
+    """
+    Each search engine has its own database, but this database might not have all the product information like `clusterHighlights` or `productClusters`.
+    As an alternative, the search engine may use the VTEX API to complete this information by setting this field to true.
+    """
+    productOriginVtex: Boolean = false
+    """
+    Indicates how the search-engine will deal with the fullText if there is more than one word. Set `and` if the returned products must have all the words in its metadata or `or` otherwise.
+    """
+    operator: Operator
+    """
+    Indicates how the search engine will correct misspelled words by using fuzzy logic.
+    It can be a number representing the max number of misspelled letters, or the string `auto` suggesting that the search-engine should set this value by itself.
+    """
+    fuzzy: String
+    """
+    As fuzzy and operator, it controls the search state, but it is for general purposes. This field allows the search engines to apply features that are not handled by the other fields.
+    The possible values in this field are defined by each search engine.
+    """
+    searchState: String
+
+    """
+    Search options that customize the search result.
+    """
+    options: Options
+    variant: String
+
+    """
+    **Deprecated**. Use `advertisementOptions` instead.
+    """
+    showSponsored: Boolean
+
+    """
+    Whether or not to fetch sponsored products. If there are sponsored products for that context, it will be returned.
+    """
+    advertisementOptions: AdvertisementOptions
+  ): ProductSearch @cacheControl(scope: SEGMENT, maxAge: 0) @withSegment
+
+  sponsoredProducts(
+    """
+    Search term. It can contain any character.
+    """
+    fullText: String = ""
+    """
+    List of the selected facets
+
+    The order in which the terms appear is not relevant to the search.
+
+    You can also repeat the same `facetKey` several times for different values.
+    """
+    selectedFacets: [SelectedFacetInput]
+    """
+    Filter by price range. e.g.: {a} TO {b} - {a} is the minimum price "from" and {b} is the highest price "to"
+    """
+    priceRange: String = ""
+    """
+    Filter by availability at a specific sales channel. e.g.: salesChannel:4 if want filter by available products for the sales channel 4
+    """
+    salesChannel: String = ""
+    """
+    Order by a criteria. OrderByPriceDESC/OrderByPriceASC, OrderByTopSaleDESC, OrderByReviewRateDESC, OrderByNameASC/OrderByNameDESC, OrderByReleaseDateDESC, OrderByBestDiscountDESC, OrderByScoreDESC
+    If you want to sort by a specification, use the format {specification key}:{asc|desc}. For example: "pricePerUnit:asc" or "size:desc" (this only works on `vtex.search-resolver@1.x`)
+    """
+    orderBy: String = "OrderByScoreDESC"
+    """
+    Pagination item start
+    """
+    from: Int = 0
+    """
+    Pagination item end
+    """
+    to: Int = 9
+    """
+    If true, uses isAvailablePerSalesChannel_ parameter on query with segment's sales channel. Will override any given salesChannel arg
+    """
+    hideUnavailableItems: Boolean = false
+    """
+    If you want faster searches and do not care about most up to date prices and promotions, use skip value.
+    """
+    simulationBehavior: SimulationBehavior = default
+    """
+    Each search engine has its own database, but this database might not have all the product information like `clusterHighlights` or `productClusters`.
+    As an alternative, the search engine may use the VTEX API to complete this information by setting this field to true.
+    """
+    productOriginVtex: Boolean = false
+    """
+    Indicates how the search-engine will deal with the fullText if there is more than one word. Set `and` if the returned products must have all the words in its metadata or `or` otherwise.
+    """
+    operator: Operator
+    """
+    Indicates how the search engine will correct misspelled words by using fuzzy logic.
+    It can be a number representing the max number of misspelled letters, or the string `auto` suggesting that the search-engine should set this value by itself.
+    """
+    fuzzy: String
+    """
+    As fuzzy and operator, it controls the search state, but it is for general purposes. This field allows the search engines to apply features that are not handled by the other fields.
+    The possible values in this field are defined by each search engine.
+    """
+    searchState: String
+
+    """
+    Search options that customize the search result.
+    """
+    options: Options
+
+    """
+    Identifier for users, logged in or not. Used for A/B tests.
+    """
+    anonymousId: String
+  ): [Product] @cacheControl(scope: SEGMENT, maxAge: 0) @withSegment
+
+  searchMetadata(
+    """
+    Terms that is used in search e.g.: eletronics/samsung
+    """
+    query: String = ""
+    """
+    Text inputted by the user as the search term
+    """
+    fullText: String = ""
+    """
+    Defines terms types: Brand, Category, Department e.g.: c,b
+    """
+    map: String = ""
+    """
+    List of the selected facets
+
+    The order in which the terms appear is not relevant to the search.
+
+    You can also repeat the same `facetKey` several times for different values.
+    """
+    selectedFacets: [SelectedFacetInput]
+  ): SearchMetadata @cacheControl(scope: PUBLIC, maxAge: 1) @withSegment
+
+  """
+  Returns products list filtered and ordered
+  """
+  products(
+    """
+    Terms that is used in search e.g.: eletronics/samsung
+    """
+    query: String = ""
+    """
+    Defines terms types: Brand, Category, Department e.g.: c,b
+    """
+    map: String = ""
+    """
+    Filter by category. {a}/{b} - {a} and {b} are categoryIds
+    """
+    category: String = ""
+    """
+    Array of product specification. specificationFilter_{a}:{b} - {a} is the specificationId, {b} = specification value
+    """
+    specificationFilters: [String]
+    """
+    Filter by price range. e.g.: {a} TO {b} - {a} is the minimum price "from" and {b} is the highest price "to"
+    """
+    priceRange: String = ""
+    """
+    Filter by collection. where collection also know as productClusterId
+    """
+    collection: String = ""
+    """
+    Filter by availability at a specific sales channel. e.g.: salesChannel:4 if want filter by available products for the sales channel 4
+    """
+    salesChannel: String = ""
+    """
+    Order by a criteria. OrderByPriceDESC/OrderByPriceASC, OrderByTopSaleDESC, OrderByReviewRateDESC, OrderByNameASC/OrderByNameDESC, OrderByReleaseDateDESC, OrderByBestDiscountDESC, OrderByScoreDESC
+    """
+    orderBy: String = "OrderByScoreDESC"
+    """
+    Pagination item start
+    """
+    from: Int = 0
+    """
+    Pagination item end
+    """
+    to: Int = 9
+    """
+    If true, uses isAvailablePerSalesChannel_ parameter on query with segment's sales channel. Will override any given salesChannel arg
+    """
+    hideUnavailableItems: Boolean = false
+    """
+    If you want faster searches and do not care about most up to date prices and promotions, use skip value.
+    """
+    simulationBehavior: SimulationBehavior = default
+    """
+    List of shipping options to filter products
+    """
+    shippingOptions: [String]
+    variant: String
+    """
+    Options for advertisement in this search request.
+    """
+    advertisementOptions: AdvertisementOptions
+    """
+    As fuzzy and operator, it controls the search state, but it is for general purposes. This field allows the search engines to apply features that are not handled by the other fields.
+    The possible values in this field are defined by each search engine.
+    """
+    searchState: String
+  ): [Product] @cacheControl(scope: SEGMENT, maxAge: 0) @withSegment
+
+  productRecommendations(
+    identifier: ProductUniqueIdentifier
+    type: CrossSelingInputEnum
+    groupBy: CrossSelingGroupByEnum
+    """
+    As fuzzy and operator, it controls the search state, but it is for general purposes. This field allows the search engines to apply features that are not handled by the other fields.
+    The possible values in this field are defined by each search engine.
+    """
+    searchState: String
+  ): [Product] @cacheControl(scope: SEGMENT, maxAge: 0) @withSegment
+
+  productsByIdentifier(
+    field: ProductUniqueIdentifierField!
+    values: [ID!]
+    """
+    Filter by availability at a specific sales channel.
+    """
+    salesChannel: String
+  ): [Product] @cacheControl(scope: SEGMENT, maxAge: 0) @withSegment
+
+  """
+  Returns facets category
+  """
+  facets(
+    """
+    **Deprecated**. Use `fullText` instead.
+    """
+    query: String = ""
+    """
+    Search term. It can contain any character.
+    """
+    fullText: String = ""
+    """
+    **Deprecated**. Use `selectedFacets` instead.
+    """
+    map: String = ""
+    """
+    List of the selected facets
+
+    The order in which the terms appear is not relevant to the search.
+
+    You can also repeat the same `facetKey` several times for different values.
+    """
+    selectedFacets: [SelectedFacetInput] = []
+    """
+    If true, uses isAvailablePerSalesChannel_ parameter on query with segment's sales channel.
+    """
+    hideUnavailableItems: Boolean = false
+    """
+    If true, remove hidden facets from the result.
+    """
+    removeHiddenFacets: Boolean = false
+    """
+    If Static, ignores SpecificationFilters received on the map and query when returning
+    the facets available, which makes the facets never change.
+    """
+    behavior: String = "Static"
+    """
+    Indicates how the search-engine will deal with the fullText if there is more than one word. Set `and` if the returned products must have all the words in its metadata or `or` otherwise.
+    """
+    operator: Operator
+    """
+    Indicates how the search engine will correct misspelled words by using fuzzy logic.
+    It can be a number representing the max number of misspelled letters, or the string `auto` suggesting that the search-engine should set this value by itself.
+    """
+    fuzzy: String
+    """
+    As fuzzy and operator, it controls the search state, but it is for general purposes. This field allows the search engines to apply features that are not handled by the other fields.
+    The possible values in this field are defined by each search engine.
+    """
+    searchState: String
+    """
+    Pagination item start
+    """
+    from: Int
+    """
+    Pagination item end
+    """
+    to: Int
+    """
+    Determines the behavior of the category tree
+    """
+    categoryTreeBehavior: CategoryTreeBehavior = default
+    """
+    Initial attributes (based on the `initialMap` parameter)
+    """
+    initialAttributes: String
+    """
+    Variant used to A/B test
+    """
+    variant: String
+  ): Facets @cacheControl(scope: SEGMENT, maxAge: 1) @withSegment
+
+  """
+  Get auto complete suggestions in search
+  """
+  autocomplete(
+    """
+    Number of items that is returned
+    """
+    maxRows: Int = 12
+    """
+    Terms that is used in search e.g.: iphone
+    """
+    searchTerm: String
+  ): Suggestions @cacheControl(scope: SEGMENT, maxAge: 1) @withSegment
+
+  """
+  Get list of the 10 most searched terms
+  """
+  topSearches(
+        """
+    As fuzzy and operator, it controls the search state, but it is for general purposes. This field allows the search engines to apply features that are not handled by the other fields.
+    The possible values in this field are defined by each search engine.
+    """
+    searchState: String
+  ): SearchSuggestions
+    @cacheControl(scope: SEGMENT, maxAge: 1)
+    @withSegment
+
+  """
+  Lists the suggested terms and attributes similar to the search term.
+  """
+  autocompleteSearchSuggestions(
+    """
+    Search term. It can contain any character.
+    """
+    fullText: String!
+    """
+    As fuzzy and operator, it controls the search state, but it is for general purposes. This field allows the search engines to apply features that are not handled by the other fields.
+    The possible values in this field are defined by each search engine.
+    """
+    searchState: String
+  ): SearchSuggestions
+    @cacheControl(scope: SEGMENT, maxAge: 1)
+    @withSegment
+
+  """
+  Get product suggestions
+  """
+  productSuggestions(
+    """
+    Text inputted by the user as the search term
+    """
+    fullText: String!
+    """
+    Selected facet key
+    """
+    facetKey: String
+    """
+    Selected facet value
+    """
+    facetValue: String
+    """
+    Each search engine has its own database, but this database might not have all the product information like `clusterHighlights` or `productClusters`.
+    As an alternative, the search engine may use the VTEX API to complete this information by setting this field to true.
+    """
+    productOriginVtex: Boolean = false
+    """
+    If you want faster searches and do not care about most up to date prices and promotions, use skip value.
+    """
+    simulationBehavior: SimulationBehavior = default
+    """
+    If true, uses isAvailablePerSalesChannel_ parameter on query with segment's sales channel
+    """
+    hideUnavailableItems: Boolean
+    """
+    Seller id encoded with base64 according to this format SW#{sellerId}
+    """
+    regionId: String
+    """
+    Sales Channel related to the region ID
+    """
+    salesChannel: Int
+    """
+    Order by a criteria. OrderByPriceDESC/OrderByPriceASC, OrderByTopSaleDESC, OrderByReviewRateDESC, OrderByNameASC/OrderByNameDESC, OrderByReleaseDateDESC, OrderByBestDiscountDESC, OrderByScoreDESC
+    If you want to sort by a specification, use the format {specification key}:{asc|desc}. For example: "pricePerUnit:asc" or "size:desc" (this only works on `vtex.search-resolver@1.x`)
+    """
+    orderBy: String = "OrderByScoreDESC"
+    """
+    Number of product suggestions that should be returned
+    """
+    count: Int
+    """
+    List of shipping options to filter suggestions
+    """
+    shippingOptions: [String]
+    variant: String
+    """
+    Whether or not to fetch sponsored products. If there are sponsored products for that context, it will be returned.
+    """
+    advertisementOptions: AdvertisementOptions
+  ): ProductSuggestions
+    @cacheControl(scope: SEGMENT, maxAge: 1)
+    @withSegment
+
+  """
+  Get search urls access stats count
+  """
+  searchURLsCount(
+    """
+    Number of items that is returned
+    """
+    limit: Int = 100
+
+    """
+    Sorting strategy, asc: ascending, desc: descending
+    """
+    sort: SORT
+  ): [SearchURLStats] @cacheControl(scope: PUBLIC, maxAge: 0)
+}
+
+enum SimulationBehavior {
+  """
+  Does simulation on catalog as usual
+  """
+  default
+  """
+  Does simulation on catalog only for seller 1P
+  """
+  only1P
+  """
+  Calls catalog passing a parameter to not simulate each SKU and get its most up to date price.
+  """
+  skip
+
+  """
+  Does the simulation on the client side
+  """
+  async
+}
+
+enum CrossSelingGroupByEnum {
+  """
+  It's the default behavior, it will group SKUs from the same product and bring only products. Limited by 12 products.
+  """
+  PRODUCT
+  """
+  Return all skus registered in the catalog for the recommendation.
+  """
+  NONE
+}
+
+enum CategoryTreeBehavior {
+  """
+  Uses the default value set by the search provider
+  """
+  default
+  """
+  Show the category tree when it is possible
+  """
+  show
+  """
+  Hide the category tree in any situation
+  """
+  hide
+}
+
+input AdvertisementOptions {
+  """
+  Whether or not to fetch sponsored products in this request.
+  """
+  showSponsored: Boolean
+  """
+  How many sponsored products should be fetched.
+  """
+  sponsoredCount: Int
+  """
+  If true, the search will return the same product twice - once as a regular product and once as a sponsored product.
+  """
+  repeatSponsoredProducts: Boolean
+  """
+  Where the sponsored product is being shown. Used for analytics purposes.
+  """
+  advertisementPlacement: String
+}

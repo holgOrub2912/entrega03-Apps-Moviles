@@ -1,0 +1,134 @@
+type QueryArgs {
+  map: String
+  query: String
+  selectedFacets: [SelectedFacet]
+}
+
+type Range {
+  from: Float
+  to: Float
+}
+
+type FacetValue {
+  id: ID
+  quantity: Int!
+  name: String @translatableV2
+  key: String
+  value: String
+  selected: Boolean
+  children: [FacetValue]
+  range: Range
+  link: String
+  linkEncoded: String
+  href: String
+}
+
+enum FilterType {
+  TEXT
+  NUMBER
+  CATEGORYTREE
+  BRAND
+  PRICERANGE
+  DELIVERY
+}
+
+type Facet {
+  name: String @translatableV2
+  values(from: Int, to: Int): [FacetValue]
+  type: FilterType
+  hidden: Boolean
+  quantity: Int
+}
+
+type Facets {
+  departments: [DepartmentFacet]
+    @deprecated(reason: "Use the `facets` instead.")
+  brands: [BrandFacet] @deprecated(reason: "Use the `facets` instead.")
+  specificationFilters: [FilterFacets]
+  categoriesTrees: [CategoriesTreeFacet] @deprecated(reason: "Use the `facets` instead.")
+  """
+  Price range for the given query.
+  """
+  priceRanges: [PriceRangesFacet]
+  recordsFiltered: Int @deprecated(reason: "Use the recordsFiltered from the `productSearch` instead.")
+  """
+  Info about the searched query.
+  """
+  queryArgs: QueryArgs
+  """
+  List of facets.
+  """
+  facets: [Facet]
+  """
+  Indicates whether there was sampling in the aggregation of facets or not. In search results that have many products, only the first 30000 will be aggregated to avoid performance issues.
+  """
+  sampling: Boolean
+  """
+  Generated breadcrumb for the given query.
+  """
+  breadcrumb: [SearchBreadcrumb]
+}
+
+type DepartmentFacet {
+  id: ID!
+  quantity: Int!
+  name: String @translatableV2
+  link: String!
+  linkEncoded: String!
+  map: String
+  value: String!
+  selected: Boolean!
+}
+
+type BrandFacet {
+  id: ID!
+  quantity: Int!
+  name: String! @translatableV2(behavior: "USER_ONLY")
+  link: String!
+  linkEncoded: String!
+  map: String
+  value: String!
+  selected: Boolean!
+}
+
+type PriceRangesFacet {
+  quantity: Int!
+  name: String @translatableV2
+  link: String!
+  linkEncoded: String!
+  map: String
+  value: String!
+  selected: Boolean!
+  slug: String
+}
+
+type CategoriesTreeFacet {
+  id: ID!
+  quantity: Int!
+  name: String @translatableV2
+  link: String!
+  linkEncoded: String!
+  """
+  Contains slugified links according to the store structure. /:department/d, /:category/:subcategory, etc
+  """
+  href: String!
+  map: String
+  value: String!
+  children: [CategoriesTreeFacet]
+  selected: Boolean!
+}
+
+type FilterFacet {
+  quantity: Int!
+  name: String @translatableV2
+  link: String!
+  linkEncoded: String!
+  map: String
+  value: String!
+  selected: Boolean!
+}
+
+type FilterFacets {
+  name: String
+  facets: [FilterFacet]
+}

@@ -1,0 +1,11 @@
+query ProductByEAN($ean: ID!) {
+    product(identifier: {field: ean, value: $ean}) @context(provider: "vtex.search-graphql@0.65.0") {
+        productId
+        productName
+        priceRange {
+            sellingPrice {
+                highPrice
+            }
+        }
+    }
+}

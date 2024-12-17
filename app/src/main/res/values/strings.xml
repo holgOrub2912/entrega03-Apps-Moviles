@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">CompraLista</string>
+    <string name="scan_prompt">Escanee el código de barras del producto</string>
+    <string name="desc_btn_scan">Escanear código de barras</string>
+    <string name="desc_btn_add_to_cart">Añadir al carrito</string>
+    <string name="desc_btn_delete">Eliminar producto</string>
+    <string name="label_product_price">Precio de producto</string>
+    <string name="desc_btn_dec_qty">Decrementar cantidad de producto</string>
+    <string name="desc_btn_inc_qty">Incrementar cantidad de producto</string>
+    <string name="label_product_quantity">Cantidad de producto</string>
+    <string name="misc_price_separator">/</string>
+    <string name="label_total">Total</string>
+    <string name="err_network">No se ha podido conectar a internet. Revisa tu conexión.</string>
+    <string name="ic_error">Error icon</string>
+</resources>
