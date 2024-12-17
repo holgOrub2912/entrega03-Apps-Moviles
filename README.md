@@ -1,8 +1,8 @@
 # CompraLista
 
-An extremely simple, Material Design groceries app that retrieves product info from [Olimpica](https://www.olimpica.com/)'s GraphQL API.
+An extremely simple Material Design groceries app that retrieves product info from [Olimpica](https://www.olimpica.com/)'s GraphQL API.
 
-This project is moslty for me to learn some Android Development, while still being a somewhat useful product.
+This project is mostly a means for me to learn some Android Development, while still being a somewhat useful product.
 
 ## Features
 * Scan barcode to add product.
