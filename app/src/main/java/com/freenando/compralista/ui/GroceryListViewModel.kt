@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.apollographql.apollo.ApolloClient
 import com.freenando.compralista.ProductByEANQuery
 import com.freenando.compralista.data.EntriesRepository
+import com.freenando.compralista.data.SupermarketList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,8 +22,8 @@ enum class AppInfo {
     NETWORK_ERROR,
 }
 
-class GroceryListViewModel(private val entriesRepository: EntriesRepository) : ViewModel() {
-    val uiState: StateFlow<ListUiState> = entriesRepository.getAllEntriesStream().map { ListUiState(it) }
+class GroceryListViewModel(private val supermarketList: SupermarketList, private val entriesRepository: EntriesRepository) : ViewModel() {
+    val uiState: StateFlow<ListUiState> = entriesRepository.getEntriesInSupermarketListStream(supermarketList.id).map { ListUiState(it) }
 
         .stateIn(
             scope = viewModelScope,
@@ -34,6 +35,7 @@ class GroceryListViewModel(private val entriesRepository: EntriesRepository) : V
         get() = _appInfo
 
     fun addProduct(ean: String) {
+        /*
         val apolloClient = ApolloClient.Builder()
             .serverUrl("https://www.olimpica.com/_v/segment/graphql/v1")
             .build();
@@ -57,6 +59,15 @@ class GroceryListViewModel(private val entriesRepository: EntriesRepository) : V
                 delay(NETWORK_ERR_DELAY)
                 _appInfo.update { AppInfo.AWAITING_INPUT }
             }
+        }
+        */
+        viewModelScope.launch {
+            val product = supermarketList.searcher.searchByEAN(ean)
+
+            if ( uiState.value.productAlreadyAdded(product.id) )
+                toggleAddedToCart(product.id)
+            else
+                saveEntry(ProductEntry(product, supermarketList.id))
         }
     }
 
