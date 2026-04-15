@@ -23,6 +23,7 @@ enum class AppInfo {
 
 class GroceryListViewModel(private val entriesRepository: EntriesRepository) : ViewModel() {
     val uiState: StateFlow<ListUiState> = entriesRepository.getAllEntriesStream().map { ListUiState(it) }
+
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILIS),

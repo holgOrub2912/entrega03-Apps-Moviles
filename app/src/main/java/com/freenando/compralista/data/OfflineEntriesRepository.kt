@@ -2,8 +2,16 @@ package com.freenando.compralista.data
 
 import kotlinx.coroutines.flow.Flow
 
-class OfflineEntriesRepository(private val entryDao: EntryDao) : EntriesRepository {
-    override fun getAllEntriesStream(): Flow<List<ProductEntry>> = entryDao.getAllEntries()
+class OfflineEntriesRepository(private val entryDao: EntryDao, private val superMarketListDao: SuperMarketListDao) : EntriesRepository {
+    override fun getSupermarketListStream(): Flow<List<SupermarketList>> = superMarketListDao.getAllSupermarketLists()
+
+    override suspend fun insertSupermarketList(supermarketList: SupermarketList) = superMarketListDao.insert(supermarketList)
+
+    override suspend fun deleteSupermarketList(supermarketList: SupermarketList) = superMarketListDao.delete(supermarketList)
+
+    override suspend fun updateSupermarketList(supermarketList: SupermarketList) = superMarketListDao.update(supermarketList)
+
+    override fun getEntriesInSupermarketListStream(superMarketListId: Int): Flow<List<ProductEntry>> = entryDao.getEntriesInSuperMarketList(superMarketListId)
 
     override fun getEntryStream(id: String): Flow<ProductEntry?> = entryDao.getEntry(id)
 

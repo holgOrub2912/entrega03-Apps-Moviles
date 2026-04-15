@@ -3,7 +3,6 @@ package com.freenando.compralista.data
 import androidx.room.Entity
 import com.freenando.compralista.ProductByEANQuery
 
-@Entity(tableName = "products")
 data class Product(
     val id: String,
     val name: String,

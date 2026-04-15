@@ -63,10 +63,14 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.freenando.compralista.R
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.freenando.compralista.data.AppContainer
 import com.freenando.compralista.data.AppDataContainer
 import com.freenando.compralista.data.ProductEntry
+import com.freenando.compralista.ui.AddNewListScreen
 import com.freenando.compralista.ui.AppInfo
 import com.freenando.compralista.ui.GroceryListViewModel
 import com.freenando.compralista.ui.GroceryListViewModelProvider
@@ -106,7 +110,38 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
-    fun CompraListaApp() {
+    fun CompraListaApp(
+        navController: NavHostController = rememberNavController()
+    ){
+        val layoutDirection = LocalLayoutDirection.current;
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(
+                    start = WindowInsets.safeDrawing.asPaddingValues()
+                        .calculateStartPadding(layoutDirection),
+                    end = WindowInsets.safeDrawing.asPaddingValues()
+                        .calculateEndPadding(layoutDirection),
+                ),
+        ){
+            NavHost(
+                navController = navController,
+                startDestination = AddNewListScreen.Start.name,
+                modifier = Modifier
+                    .fillMaxSize()
+            ){
+                composable(route = AddNewListScreen.Start.name) {
+                    AddNewListScreen(
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun ProductList() {
         groceryListViewModel = viewModel(factory = GroceryListViewModelProvider(this).Factory)
         val groceryListUiState by groceryListViewModel.uiState.collectAsState();
         val appInfo by groceryListViewModel.appInfo.collectAsState()

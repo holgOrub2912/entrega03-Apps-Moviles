@@ -12,4 +12,7 @@
     <string name="label_total">Total</string>
     <string name="err_network">No se ha podido conectar a internet. Revisa tu conexión.</string>
     <string name="ic_error">Error icon</string>
+    <string name="add_supermarket_list">Añadir nueva lista de supermercado</string>
+    <string name="compare_price">Comparar precios</string>
+    <string name="supermarket_list">Productos en Lista</string>
 </resources>

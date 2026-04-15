@@ -22,6 +22,6 @@ interface EntryDao {
     @Query("SELECT * from productEntries WHERE id = :id")
     fun getEntry(id: String): Flow<ProductEntry>
 
-    @Query("SELECT * from productEntries")
-    fun getAllEntries(): Flow<List<ProductEntry>>
+    @Query("SELECT * from productEntries WHERE superMarketListId = :superMarketListId")
+    fun getEntriesInSuperMarketList(superMarketListId: Int): Flow<List<ProductEntry>>
 }
