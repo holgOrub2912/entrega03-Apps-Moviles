@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.freenando.compralista.data.EntriesRepository
 import com.freenando.compralista.data.SupermarketList
+import com.freenando.compralista.data.SupermarketListInfo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class SupermarketListsUiState(
-    val list: List<SupermarketList> = listOf()
+    val list: List<SupermarketListInfo> = listOf()
 )
 
 class SupermarketListViewModel(private val repository: EntriesRepository): ViewModel() {

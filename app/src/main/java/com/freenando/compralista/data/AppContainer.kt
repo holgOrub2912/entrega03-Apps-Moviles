@@ -8,9 +8,10 @@ interface AppContainer {
 
 class AppDataContainer(private val context: Context) : AppContainer {
     override val entriesRepository: EntriesRepository by lazy {
+        val database = EntryDatabase.getDatabase(context)
         OfflineEntriesRepository(
-            EntryDatabase.getDatabase(context).entryDao(),
-            SupermarketListDatabase.getDatabase(context).supermarketListDao()
+            database.entryDao(),
+            database.supermarketListDao()
         )
     }
 }

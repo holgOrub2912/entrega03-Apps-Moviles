@@ -25,7 +25,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import java.text.NumberFormat
 
+private val currencyFormatter = NumberFormat.getCurrencyInstance()
 sealed class AppScreen(val route: String, @StringRes val title: Int){
     data object Start: AppScreen("home", R.string.app_name)
     data object NewList: AppScreen("addlist", R.string.add_supermarket_list)
@@ -67,6 +69,7 @@ fun OverviewListScreen(repository: EntriesRepository, onNavigateToNewList: () ->
                 items(supermarketLists, key = {it.id}){supermarketList ->
                     Row() {
                         Text(supermarketList.name)
+                        Text(currencyFormatter.format(supermarketList.totalPrice))
                         Text(supermarketList.searcher.name)
                         Button(onClick = { onNavigateToExistingList(supermarketList.id)}) {
                             Text("Go to list")

@@ -3,7 +3,7 @@ package com.freenando.compralista.data
 import kotlinx.coroutines.flow.Flow
 
 interface EntriesRepository {
-    fun getSupermarketListStream() : Flow<List<SupermarketList>>
+    fun getSupermarketListStream() : Flow<List<SupermarketListInfo>>
 
     fun getSupermarketList(id: Int): Flow<SupermarketList?>
 
