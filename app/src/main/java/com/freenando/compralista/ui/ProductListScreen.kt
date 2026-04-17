@@ -71,11 +71,14 @@ import java.text.NumberFormat
 private val currencyFormatter = NumberFormat.getCurrencyInstance()
 
 @Composable
-fun ProductListScreen(supermarketListId: Int, context: MainActivity, modifier: Modifier = Modifier) {
+fun ProductListScreen(supermarketListId: Int, context: MainActivity, newProductEan: String? = null, modifier: Modifier = Modifier) {
     val groceryListViewModel = viewModel<GroceryListViewModel>(factory = GroceryListViewModelProvider(supermarketListId, context).Factory)
     val groceryListUiState by groceryListViewModel.uiState.collectAsState();
     val appInfo by groceryListViewModel.appInfo.collectAsState()
     val layoutDirection = LocalLayoutDirection.current;
+
+    if (newProductEan != null)
+        groceryListViewModel.addProduct(newProductEan)
 
     context.scanProductAction = {
         groceryListViewModel.addProduct(it)

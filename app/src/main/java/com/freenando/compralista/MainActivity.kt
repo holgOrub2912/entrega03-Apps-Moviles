@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -29,6 +31,7 @@ import com.freenando.compralista.data.AppDataContainer
 import com.freenando.compralista.data.SupermarketList
 import com.freenando.compralista.search.AllSupermarketSearcher
 import com.freenando.compralista.ui.AddNewListScreen
+import com.freenando.compralista.ui.ComparePriceScreen
 import com.freenando.compralista.ui.GroceryListViewModel
 import com.freenando.compralista.ui.ProductListScreen
 import com.freenando.compralista.ui.SupermarketListViewModel
@@ -43,11 +46,18 @@ class MainActivity : ComponentActivity() {
     
     private val currencyFormatter = NumberFormat.getCurrencyInstance()
     lateinit var scanProductAction: (String) -> Unit
+    private lateinit var compareAction: (String) -> Unit
 
     private val barcodeLauncher =
         registerForActivityResult( ScanContract() ){ result ->
             if (result.contents != null)
                 scanProductAction(result.contents)
+        }
+
+    private val compareBarcodeLauncher =
+        registerForActivityResult( ScanContract() ){ result ->
+            if (result.contents != null)
+                compareAction(result.contents)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,14 +76,24 @@ class MainActivity : ComponentActivity() {
                 .setPrompt(resources.getString(R.string.scan_prompt)))
     }
 
+    fun compareScanBarcode(){
+        compareBarcodeLauncher.launch(ScanOptions()
+            .setOrientationLocked(true)
+            .setPrompt(resources.getString(R.string.scan_prompt)))
+    }
+
 
     @Composable
     fun CompraListaApp(
         context: MainActivity,
+        supermarketListViewModel: SupermarketListViewModel = SupermarketListViewModel(repository = context.container.entriesRepository)
     ){
         val layoutDirection = LocalLayoutDirection.current;
-        val supermarketListViewModel = SupermarketListViewModel(repository = context.container.entriesRepository)
+        val supermarketLists by supermarketListViewModel.uiState.collectAsState()
         val navController: NavHostController = rememberNavController()
+        context.compareAction = {ean ->
+            navController.navigate(AppScreen.ComparePrices.createRoute(ean))
+        }
         Surface(
             modifier = Modifier
                 .fillMaxSize()
@@ -99,7 +119,8 @@ class MainActivity : ComponentActivity() {
                         },
                         onNavigateToExistingList = {
                             navController.navigate(AppScreen.ProductList.createRoute(it))
-                        }
+                        },
+                        onNavigateToCompare = { context.compareScanBarcode() }
                     )
                 }
                 composable(AppScreen.NewList.route) {
@@ -112,11 +133,30 @@ class MainActivity : ComponentActivity() {
                 composable(AppScreen.ProductList.route, arguments = listOf(
                     navArgument("supermarketListId"){
                         type = NavType.IntType
+                    },
+                    navArgument("ean"){
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
                     })){backStackEntry ->
                     val supermarketListId = backStackEntry.arguments?.getInt("supermarketListId") ?: return@composable
+                    val newProductEan = backStackEntry.arguments?.getString("ean")
                     ProductListScreen(
                         supermarketListId = supermarketListId,
                         context = context,
+                        newProductEan = newProductEan,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                composable(AppScreen.ComparePrices.route, arguments = listOf(
+                    navArgument("ean"){
+                        type = NavType.StringType
+                    })){backStackEntry ->
+                    val ean = backStackEntry.arguments?.getString("ean") ?: return@composable
+                    ComparePriceScreen(
+                        ean = ean,
+                        searchers = supermarketLists.list,
+                        onAddToList = {ean, listId -> navController.navigate(AppScreen.ProductList.createRoute(listId, ean)) },
                         modifier = Modifier.fillMaxSize()
                     )
                 }

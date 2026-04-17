@@ -31,11 +31,12 @@ private val currencyFormatter = NumberFormat.getCurrencyInstance()
 sealed class AppScreen(val route: String, @StringRes val title: Int){
     data object Start: AppScreen("home", R.string.app_name)
     data object NewList: AppScreen("addlist", R.string.add_supermarket_list)
-    data object ComparePrices: AppScreen("compare/{productId}", R.string.add_supermarket_list) {
-        fun createRoute(productId: Int): String = "compare/$productId"
+    data object ComparePrices: AppScreen("compare/{ean}", R.string.compare_price) {
+        fun createRoute(ean: String): String = "compare/$ean"
     }
-    data object ProductList: AppScreen("list/{supermarketListId}", R.string.supermarket_list){
+    data object ProductList: AppScreen("list/{supermarketListId}?newProductEan={ean}", R.string.supermarket_list){
         fun createRoute(supermarketListId: Int): String = "list/$supermarketListId"
+        fun createRoute(supermarketListId: Int, newProductEan: String): String = "list/$supermarketListId?newProductEan=$newProductEan"
     }
 }
 
@@ -56,13 +57,23 @@ fun NavigateToNewListScreenBtn(onClick: () -> Unit, modifier: Modifier = Modifie
 }
 
 @Composable
-fun OverviewListScreen(repository: EntriesRepository, onNavigateToNewList: () -> Unit, onNavigateToExistingList: (id: Int) -> Unit, modifier: Modifier = Modifier){
+fun OverviewListScreen(repository: EntriesRepository,
+                       onNavigateToNewList: () -> Unit,
+                       onNavigateToExistingList: (id: Int) -> Unit,
+                       onNavigateToCompare: () -> Unit,
+                       modifier: Modifier = Modifier
+){
     val supermarketLists by repository.getSupermarketListStream().collectAsState(listOf())
 
     Column(
         modifier = modifier
     ) {
-        Scaffold(floatingActionButton = { NavigateToNewListScreenBtn(onClick = onNavigateToNewList) }) {innerPadding ->
+        Scaffold(floatingActionButton = {
+            Row(modifier = Modifier) {
+                Button(onClick = onNavigateToCompare) { Text("Comparar precios") }
+                NavigateToNewListScreenBtn(onClick = onNavigateToNewList)
+            }
+        }) {innerPadding ->
             LazyColumn(modifier = Modifier
                 .fillMaxHeight()
                 .padding(innerPadding)) {
