@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.freenando.compralista"
+    namespace = "com.freenando.ListaCompra"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.freenando.compralista"
+        applicationId = "com.freenando.ListaCompra"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -97,6 +97,6 @@ dependencies {
 
 apollo {
     service("service"){
-        packageName.set("com.freenando.compralista")
+        packageName.set("com.freenando.ListaCompra")
     }
 }

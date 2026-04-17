@@ -16,4 +16,5 @@
     <string name="add_supermarket_list">Añadir nueva lista de supermercado</string>
     <string name="compare_price">Comparar precios</string>
     <string name="supermarket_list">Productos en Lista</string>
+    <string name="desc_btn_goto_list">Ir a lista de compra</string>
 </resources>
