@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 class OfflineEntriesRepository(private val entryDao: EntryDao, private val superMarketListDao: SuperMarketListDao) : EntriesRepository {
     override fun getSupermarketListStream(): Flow<List<SupermarketList>> = superMarketListDao.getAllSupermarketLists()
 
+    override fun getSupermarketList(id: Int): Flow<SupermarketList?> = superMarketListDao.getSupermarketList(id)
+
     override suspend fun insertSupermarketList(supermarketList: SupermarketList) = superMarketListDao.insert(supermarketList)
 
     override suspend fun deleteSupermarketList(supermarketList: SupermarketList) = superMarketListDao.delete(supermarketList)

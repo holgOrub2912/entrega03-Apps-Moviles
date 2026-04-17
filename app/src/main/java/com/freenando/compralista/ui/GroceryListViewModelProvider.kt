@@ -5,10 +5,10 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.freenando.compralista.MainActivity
 import com.freenando.compralista.data.SupermarketList
 
-class GroceryListViewModelProvider(supermarketList: SupermarketList, context: MainActivity) {
+class GroceryListViewModelProvider(supermarketListId: Int, context: MainActivity) {
     val Factory = viewModelFactory {
         initializer {
-            GroceryListViewModel(supermarketList, context.container.entriesRepository)
+            GroceryListViewModel(supermarketListId, context.container.entriesRepository)
         }
     }
 }

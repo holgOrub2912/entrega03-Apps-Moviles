@@ -9,6 +9,7 @@
     <string name="desc_btn_inc_qty">Incrementar cantidad de producto</string>
     <string name="label_product_quantity">Cantidad de producto</string>
     <string name="misc_price_separator">/</string>
+    <string name="label_supermarket_list_name_textfield">Nombre de lista</string>
     <string name="label_total">Total</string>
     <string name="err_network">No se ha podido conectar a internet. Revisa tu conexión.</string>
     <string name="ic_error">Error icon</string>

@@ -21,4 +21,7 @@ interface SuperMarketListDao {
 
     @Query("SELECT * FROM supermarketLists")
     fun getAllSupermarketLists(): Flow<List<SupermarketList>>
+
+    @Query("SELECT * FROM supermarketLists WHERE id = :id")
+    fun getSupermarketList(id: Int): Flow<SupermarketList?>
 }

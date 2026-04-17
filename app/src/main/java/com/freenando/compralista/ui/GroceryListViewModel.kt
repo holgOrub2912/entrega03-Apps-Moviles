@@ -3,11 +3,13 @@ package com.freenando.compralista.ui
 import com.freenando.compralista.data.ProductEntry
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.apollographql.apollo.ApolloClient
 import com.freenando.compralista.ProductByEANQuery
 import com.freenando.compralista.data.EntriesRepository
 import com.freenando.compralista.data.SupermarketList
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,14 +24,15 @@ enum class AppInfo {
     NETWORK_ERROR,
 }
 
-class GroceryListViewModel(private val supermarketList: SupermarketList, private val entriesRepository: EntriesRepository) : ViewModel() {
-    val uiState: StateFlow<ListUiState> = entriesRepository.getEntriesInSupermarketListStream(supermarketList.id).map { ListUiState(it) }
-
+class GroceryListViewModel(private val supermarketListId: Int, private val entriesRepository: EntriesRepository) : ViewModel() {
+    val uiState: StateFlow<ListUiState> = entriesRepository.getEntriesInSupermarketListStream(supermarketListId).map { ListUiState(it) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILIS),
             initialValue = ListUiState()
         )
+
+    val supermarketListUiState: Flow<SupermarketList?> = entriesRepository.getSupermarketList(supermarketListId)
     private val _appInfo: MutableStateFlow<AppInfo> = MutableStateFlow(AppInfo.AWAITING_INPUT);
     val appInfo
         get() = _appInfo
@@ -62,12 +65,16 @@ class GroceryListViewModel(private val supermarketList: SupermarketList, private
         }
         */
         viewModelScope.launch {
-            val product = supermarketList.searcher.searchByEAN(ean)
+            supermarketListUiState.collect(
+                {supermarketList ->
+                    val product = supermarketList!!.searcher.searchByEAN(ean)
 
-            if ( uiState.value.productAlreadyAdded(product.id) )
-                toggleAddedToCart(product.id)
-            else
-                saveEntry(ProductEntry(product, supermarketList.id))
+                    if ( uiState.value.productAlreadyAdded(product.id) )
+                        toggleAddedToCart(product.id)
+                    else
+                        saveEntry(ProductEntry(product, supermarketListId))
+                }
+            )
         }
     }
 

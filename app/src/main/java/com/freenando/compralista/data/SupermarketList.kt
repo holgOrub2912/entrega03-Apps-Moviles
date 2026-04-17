@@ -6,8 +6,8 @@ import com.freenando.compralista.search.AllSupermarketSearcher
 
 @Entity(tableName = "supermarketLists")
 data class SupermarketList(
-    @PrimaryKey
-    val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val name: String,
     val searcher: AllSupermarketSearcher,
 )

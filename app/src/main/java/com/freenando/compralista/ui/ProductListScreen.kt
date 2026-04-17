@@ -64,17 +64,23 @@ import com.freenando.compralista.R
 import com.freenando.compralista.data.ProductEntry
 import com.freenando.compralista.data.SupermarketList
 import com.freenando.compralista.ui.theme.CompraListaTheme
+import com.journeyapps.barcodescanner.ScanContract
 import java.text.NumberFormat
 
 
 private val currencyFormatter = NumberFormat.getCurrencyInstance()
 
 @Composable
-fun ProductListScreen(supermarketList: SupermarketList, context: MainActivity, modifier: Modifier = Modifier) {
-    val groceryListViewModel = viewModel<GroceryListViewModel>(factory = GroceryListViewModelProvider(supermarketList, context).Factory)
+fun ProductListScreen(supermarketListId: Int, context: MainActivity, modifier: Modifier = Modifier) {
+    val groceryListViewModel = viewModel<GroceryListViewModel>(factory = GroceryListViewModelProvider(supermarketListId, context).Factory)
     val groceryListUiState by groceryListViewModel.uiState.collectAsState();
     val appInfo by groceryListViewModel.appInfo.collectAsState()
     val layoutDirection = LocalLayoutDirection.current;
+
+    context.scanProductAction = {
+        groceryListViewModel.addProduct(it)
+    }
+
     Surface(
         modifier = modifier
             .fillMaxSize()
@@ -87,7 +93,9 @@ fun ProductListScreen(supermarketList: SupermarketList, context: MainActivity, m
             ),
     ){
         Scaffold(
-            floatingActionButton = { ScanBtn(onClick = {}) }
+            floatingActionButton = { ScanBtn(onClick = {
+                context.scanBarcode()
+            }) }
         ) { innerPadding ->
             Column(
                 modifier = Modifier

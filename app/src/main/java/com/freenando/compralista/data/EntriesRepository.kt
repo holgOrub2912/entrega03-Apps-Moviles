@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 interface EntriesRepository {
     fun getSupermarketListStream() : Flow<List<SupermarketList>>
 
+    fun getSupermarketList(id: Int): Flow<SupermarketList?>
+
     suspend fun insertSupermarketList(supermarketList: SupermarketList)
 
     suspend fun deleteSupermarketList(supermarketList: SupermarketList)
