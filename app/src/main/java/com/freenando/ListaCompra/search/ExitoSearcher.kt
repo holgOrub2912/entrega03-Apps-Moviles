@@ -1,5 +1,6 @@
 package com.freenando.ListaCompra.search
 
+import androidx.annotation.DrawableRes
 import com.freenando.ListaCompra.data.Product
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -12,6 +13,7 @@ import retrofit2.await
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.create
 import retrofit2.http.Query
+import com.freenando.ListaCompra.R
 
 @Serializable
 data class ExitoOffer(
@@ -62,6 +64,8 @@ public interface ExitoSearcherService {
 class ExitoSearcher: SupermarketSearcher {
     private val SUPERMARKET_NAME = "Éxito"
     override fun getSupermarketName(): String = SUPERMARKET_NAME
+    @DrawableRes
+    override fun getSupermarketImageRes(): Int = R.drawable.exito
 
     override suspend fun searchByEAN(ean: String): Product {
         val defaultJson = Json {
