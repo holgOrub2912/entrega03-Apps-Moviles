@@ -125,10 +125,11 @@ fun SupermarketLists(
                         .padding(bottom = 50.dp)
                 ) {
                     /// TODO: Logo should go here
-                    Button(
-                        onClick = onNavigateToCompare,
-                        shape = MaterialTheme.shapes.small
-                    ) { Text(stringResource(R.string.compare_price)) }
+                    if (supermarketLists.size > 0)
+                        Button(
+                            onClick = onNavigateToCompare,
+                            shape = MaterialTheme.shapes.small
+                        ) { Text(stringResource(R.string.compare_price)) }
                 }
                 LazyColumn {
                     items(supermarketLists, key = {it.id}){supermarketList ->

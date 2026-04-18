@@ -1,5 +1,8 @@
 package com.freenando.ListaCompra.ui
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,8 +20,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -30,12 +36,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusModifier
@@ -66,22 +74,63 @@ fun ComparePriceScreen(
     onNavBack: () -> Unit,
     onAddToList: (String, Int) -> Unit
 ){
-    val uiState by produceState(key1 = ean, key2 = searchers, initialValue = ProductComparisonUiState()){
-        value = ProductComparisonUiState(searchers
-            .distinctBy { it.searcher.getSupermarketName() }
-            .map { Pair(it.searcher, it.searcher.searchByEAN(ean)) }
-            .toList())
+    val uiState by produceState(key1 = ean, key2 = searchers, initialValue = ProductComparisonUiState(
+        ProductComparisonInfo.LOADING)){
+        try {
+            value = ProductComparisonUiState(info = ProductComparisonInfo.DONE,searchers
+                .distinctBy { it.searcher.getSupermarketName() }
+                .map { Pair(it.searcher, it.searcher.searchByEAN(ean)) }
+                .toList())
+        } catch (e: Exception) {
+            value = ProductComparisonUiState(info = ProductComparisonInfo.ERROR)
+        }
     }
 
+    Column (modifier = modifier.padding(
+            vertical = dimensionResource(R.dimen.padding_small),
+            horizontal = dimensionResource(R.dimen.padding_small)
+            ).fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        when {
+            uiState.info == ProductComparisonInfo.LOADING || (uiState.info != ProductComparisonInfo.ERROR && uiState.isEmpty()) -> CircularProgressIndicator(
+                modifier = Modifier.size(48.dp)
+                    .padding(top = 50.dp),
+                color = MaterialTheme.colorScheme.secondary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
 
-    ComparePriceList(
-        ean,
-        uiState,
-        searchers,
-        onAddToList = onAddToList,
-        onNavBack = onNavBack,
-        modifier = Modifier,
-    )
+            uiState.info == ProductComparisonInfo.DONE && !uiState.isEmpty() -> ComparePriceList(
+                ean,
+                uiState,
+                searchers,
+                onAddToList = onAddToList,
+                onNavBack = onNavBack,
+                modifier = Modifier,
+            )
+
+            uiState.info == ProductComparisonInfo.ERROR -> Card(
+                colors = CardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurface
+                )
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Rounded.Warning,
+                        contentDescription = stringResource(R.string.ic_error),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    )
+                    Text(
+                        text = stringResource(R.string.err_network),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    )
+
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -126,7 +175,14 @@ fun ComparePriceList(
                 .fillMaxSize()
         ) {
             items(productPairs.list, key = {Pair(it.first.getSupermarketName(), it.second.id.toString())}){pair ->
-                Column {
+                Column (
+                    modifier = Modifier
+                        .animateItem(
+                            fadeInSpec = tween(durationMillis = 250),
+                            fadeOutSpec = tween(durationMillis = 250),
+                            placementSpec = spring(stiffness = Spring.StiffnessLow, dampingRatio = Spring.DampingRatioLowBouncy)
+                        )
+                ) {
                     Card(
                         modifier = Modifier
                             .fillMaxSize()
@@ -202,7 +258,7 @@ fun ComparePriceListPreview(){
         Surface {
             ComparePriceList(
                 "",
-                ProductComparisonUiState(listOf(
+                ProductComparisonUiState(ProductComparisonInfo.DONE, listOf(
                     Pair(AllSupermarketSearcher.EXITO,
                         Product(
                         id = "2",

@@ -11,28 +11,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.collections.map
 
-data class ProductComparisonUiState(
-    val list: List<Pair<SupermarketSearcher, Product>> = listOf()
-){
-    fun isEmpty(): Boolean = list.isEmpty()
+enum class ProductComparisonInfo {
+    LOADING,
+    DONE,
+    ERROR,
 }
 
-class ProductComparisonViewModel(private val ean: String, private val searchers: List<SupermarketListInfo>): ViewModel() {
-    private val _uiState: MutableStateFlow<ProductComparisonUiState>
-        = MutableStateFlow(ProductComparisonUiState())
-    val uiState: StateFlow<ProductComparisonUiState> = _uiState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            _uiState.value = ProductComparisonUiState(searchers
-                .map { it.searcher}
-                .toSet()
-                .map { Pair(it, it.searchByEAN(ean)) }
-                .toList())
-        }
-    }
-
-    companion object {
-        private const val TIMEOUT_MILIS = 5_000L
-    }
+data class ProductComparisonUiState(
+    val info: ProductComparisonInfo,
+    val list: List<Pair<SupermarketSearcher, Product>> = listOf(),
+){
+    fun isEmpty(): Boolean = list.isEmpty()
 }
