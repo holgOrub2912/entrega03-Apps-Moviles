@@ -159,6 +159,7 @@ class MainActivity : ComponentActivity() {
                             navController.popBackStack()
                             navController.navigate(AppScreen.ProductList.createRoute(listId, ean))
                       },
+                        onNavBack = {navController.popBackStack()},
                         modifier = Modifier.fillMaxSize()
                     )
                 }

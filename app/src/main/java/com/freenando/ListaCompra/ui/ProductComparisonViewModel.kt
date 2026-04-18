@@ -18,16 +18,11 @@ data class ProductComparisonUiState(
 }
 
 class ProductComparisonViewModel(private val ean: String, private val searchers: List<SupermarketListInfo>): ViewModel() {
-    private val _uiState: MutableStateFlow<ProductComparisonUiState> = MutableStateFlow(ProductComparisonUiState())
-    val uiState: StateFlow<ProductComparisonUiState>
-        get() {
-            if (_uiState.value.isEmpty())
-                loadProducts()
-            return _uiState.asStateFlow()
-        }
+    private val _uiState: MutableStateFlow<ProductComparisonUiState>
+        = MutableStateFlow(ProductComparisonUiState())
+    val uiState: StateFlow<ProductComparisonUiState> = _uiState.asStateFlow()
 
-
-    fun loadProducts(){
+    init {
         viewModelScope.launch {
             _uiState.value = ProductComparisonUiState(searchers
                 .map { it.searcher}

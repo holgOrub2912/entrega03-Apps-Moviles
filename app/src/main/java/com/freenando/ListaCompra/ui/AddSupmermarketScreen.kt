@@ -77,12 +77,8 @@ fun NewListForm(
     var listSearcher: AllSupermarketSearcher? by remember { mutableStateOf(null) }
     var menuExpanded by remember { mutableStateOf(false) }
 
-    Surface(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.SpaceBetween
@@ -186,16 +182,17 @@ fun NewListForm(
             Spacer(modifier = Modifier.fillMaxHeight(0.4f))
         }
 
-    }
 }
 
 @Composable
 @Preview
 fun AddNewListScreenPreview(){
     CompraListaTheme {
-        NewListForm(
-            onAddList = {_, _ -> },
-            onNavBack = {}
-        )
+        Surface {
+            NewListForm(
+                onAddList = {_, _ -> },
+                onNavBack = {}
+            )
+        }
     }
 }

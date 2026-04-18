@@ -24,4 +24,5 @@
     <string name="display_supermarket_options">Desplegar lista de supermercados</string>
     <string name="add_supermarket_list_btn">Confirmar</string>
     <string name="navigate_back_main_menu">De vuelta al menú principal</string>
+    <string name="add_product_to_list">Añadir producto a una lista</string>
 </resources>
