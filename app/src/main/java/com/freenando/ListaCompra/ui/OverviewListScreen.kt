@@ -158,6 +158,7 @@ fun SupermarketLists(
                                         softWrap = true,
                                         modifier = Modifier
                                             .padding(vertical = 8.dp)
+                                            .fillMaxWidth(0.7f)
                                     )
                                     Row(
                                         horizontalArrangement = Arrangement.End,

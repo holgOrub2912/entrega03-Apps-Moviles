@@ -27,9 +27,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
@@ -69,9 +71,10 @@ import java.text.NumberFormat
 private val currencyFormatter = NumberFormat.getCurrencyInstance()
 
 @Composable
-fun ProductListScreen(supermarketListId: Int, context: MainActivity, newProductEan: String? = null, modifier: Modifier = Modifier) {
+fun ProductListScreen(supermarketListId: Int, context: MainActivity, newProductEan: String? = null, onNavBack: () -> Unit, modifier: Modifier = Modifier) {
     val groceryListViewModel = viewModel<GroceryListViewModel>(factory = GroceryListViewModelProvider(supermarketListId, context).Factory)
     val groceryListUiState by groceryListViewModel.uiState.collectAsState();
+    val supermarketListUiState by groceryListViewModel.supermarketListUiState.collectAsState(null)
     val appInfo by groceryListViewModel.appInfo.collectAsState()
     val layoutDirection = LocalLayoutDirection.current;
 
@@ -94,9 +97,50 @@ fun ProductListScreen(supermarketListId: Int, context: MainActivity, newProductE
             ),
     ){
         Scaffold(
-            floatingActionButton = { ScanBtn(onClick = {
-                context.scanBarcode()
-            }) }
+            topBar = {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(top = 30.dp, bottom = 40.dp, start = 20.dp, end = 20.dp)
+                        .fillMaxWidth()
+                ) {
+                    supermarketListUiState?.let { Text(it.name) }
+                    IconButton (
+                        onClick = onNavBack,
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .width(70.dp)
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Default.ArrowBack,
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            contentDescription = stringResource(R.string.navigate_back_main_menu),
+                        )
+                    }
+                }
+            },
+            bottomBar = {
+                Row (
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(vertical = 30.dp, horizontal = 20.dp)
+                        .fillMaxWidth()
+                ) {
+                    TotalPriceBox(
+                        cartPrice = groceryListUiState.list
+                            .filter { it.addedToCart }
+                            .sumOf  { it.totalPrice },
+                        totalPrice = groceryListUiState.list
+                            .sumOf{ it.totalPrice },
+                    )
+                    ScanBtn(onClick = { context.scanBarcode() })
+                }
+            }
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -229,6 +273,8 @@ fun ProductEntryCard(productEntry: ProductEntry,
                         TextDecoration.LineThrough
                     else
                         null,
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
                 )
                 Row {
                     SmallBtnIcon(
@@ -357,23 +403,6 @@ fun ProductList(onProductDeletion: (String) -> Unit,
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(R.string.label_total),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.primary,
-                        shape = MaterialTheme.shapes.small)
-                    .padding(dimensionResource(R.dimen.padding_small))
-            )
-            TotalPriceBox(
-                cartPrice = groceryList
-                    .filter { it.addedToCart }
-                    .sumOf  { it.totalPrice },
-                totalPrice = groceryList
-                    .sumOf{ it.totalPrice },
-            )
-
         }
         LazyColumn(modifier = if (appInfo == AppInfo.AWAITING_INPUT) Modifier.fillMaxHeight() else Modifier) {
             items(groceryList, key = { it.id }) { productEntry ->
@@ -424,7 +453,7 @@ fun ProductListPreview(){
                     ),
                     ProductEntry(
                         id = "3",
-                        name = "Piña común",
+                        name = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                         unitPrice = 8000.0,
                         quantity = 3,
                         superMarketListId = 0

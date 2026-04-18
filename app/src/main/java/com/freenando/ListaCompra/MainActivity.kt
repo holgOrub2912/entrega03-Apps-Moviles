@@ -144,6 +144,7 @@ class MainActivity : ComponentActivity() {
                         supermarketListId = supermarketListId,
                         context = context,
                         newProductEan = newProductEan,
+                        onNavBack = {navController.popBackStack()},
                         modifier = Modifier.fillMaxSize()
                     )
                 }
