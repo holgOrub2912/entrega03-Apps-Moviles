@@ -34,43 +34,22 @@ class GroceryListViewModel(private val supermarketListId: Int, private val entri
         get() = _appInfo
 
     fun addProduct(ean: String) {
-        /*
-        val apolloClient = ApolloClient.Builder()
-            .serverUrl("https://www.olimpica.com/_v/segment/graphql/v1")
-            .build();
-        _appInfo.update { AppInfo.LOADING }
-
         viewModelScope.launch {
-            val response = apolloClient
-                .query(ProductByEANQuery(ean = ean))
-                .execute();
-            if (response.data != null
-                && response.data!!.product != null
-            ) {
-                if ( uiState.value.productAlreadyAdded(response.data!!.product?.productId!!) )
-                    toggleAddedToCart(response.data!!.product?.productId!!)
-                else
-                    saveEntry(ProductEntry(response.data!!.product!!))
-                _appInfo.update { AppInfo.AWAITING_INPUT }
-                // stateIsLoading.update { false }
-            } else {
-                _appInfo.update { AppInfo.NETWORK_ERROR }
-                delay(NETWORK_ERR_DELAY)
-                _appInfo.update { AppInfo.AWAITING_INPUT }
+            try {
+                supermarketListUiState.collect(
+                    { supermarketList ->
+                        _appInfo.value = AppInfo.LOADING
+                        val product = supermarketList!!.searcher.searchByEAN(ean)
+                        if (uiState.value.productAlreadyAdded(product.id))
+                            toggleAddedToCart(product.id)
+                        else
+                            saveEntry(ProductEntry(product, supermarketListId))
+                        _appInfo.value = AppInfo.AWAITING_INPUT
+                    }
+                )
+            } catch (e: Exception) {
+                _appInfo.value = AppInfo.NETWORK_ERROR
             }
-        }
-        */
-        viewModelScope.launch {
-            supermarketListUiState.collect(
-                {supermarketList ->
-                    val product = supermarketList!!.searcher.searchByEAN(ean)
-
-                    if ( uiState.value.productAlreadyAdded(product.id) )
-                        toggleAddedToCart(product.id)
-                    else
-                        saveEntry(ProductEntry(product, supermarketListId))
-                }
-            )
         }
     }
 
