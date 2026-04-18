@@ -15,6 +15,13 @@
     <string name="ic_error">Error icon</string>
     <string name="add_supermarket_list">Añadir nueva lista de supermercado</string>
     <string name="compare_price">Comparar precios</string>
+    <string name="delete_list">Eliminar lista de compra</string>
     <string name="supermarket_list">Productos en Lista</string>
     <string name="desc_btn_goto_list">Ir a lista de compra</string>
+    <string name="products_qty_indicator_singular">Producto</string>
+    <string name="products_qty_indicator_plural">Productos</string>
+    <string name="no_supermarket_selected">Seleccionar supermercado</string>
+    <string name="display_supermarket_options">Desplegar lista de supermercados</string>
+    <string name="add_supermarket_list_btn">Confirmar</string>
+    <string name="navigate_back_main_menu">De vuelta al menú principal</string>
 </resources>

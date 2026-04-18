@@ -117,13 +117,15 @@ class MainActivity : ComponentActivity() {
                         onNavigateToExistingList = {
                             navController.navigate(AppScreen.ProductList.createRoute(it))
                         },
-                        onNavigateToCompare = { context.compareScanBarcode() }
+                        onNavigateToCompare = { context.compareScanBarcode() },
+                        onDeleteList = { supermarketListViewModel.deleteList(it) }
                     )
                 }
                 composable(AppScreen.NewList.route) {
                     AddNewListScreen(
                         viewModel = supermarketListViewModel,
                         onSupermarketListAdded = {navController.popBackStack()},
+                        onNavBack = {navController.popBackStack()},
                         modifier = Modifier.fillMaxSize()
                     )
                 }

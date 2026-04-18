@@ -19,7 +19,7 @@ interface SuperMarketListDao {
     @Delete
     suspend fun delete(supermarketList: SupermarketList)
 
-    @Query("SELECT supermarketLists.id id, supermarketLists.name name, supermarketLists.searcher searcher, SUM(productEntries.quantity * productEntries.unitPrice) totalPrice FROM supermarketLists LEFT JOIN productEntries ON supermarketLists.id = productEntries.superMarketListId GROUP BY supermarketLIsts.id")
+    @Query("SELECT supermarketLists.id id, supermarketLists.name name, supermarketLists.searcher searcher, SUM(productEntries.quantity * productEntries.unitPrice) totalPrice, SUM(productEntries.quantity) totalProducts FROM supermarketLists LEFT JOIN productEntries ON supermarketLists.id = productEntries.superMarketListId GROUP BY supermarketLIsts.id")
     fun getAllSupermarketLists(): Flow<List<SupermarketListInfo>>
 
     @Query("SELECT * FROM supermarketLists WHERE id = :id")

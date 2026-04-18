@@ -10,11 +10,18 @@ data class SupermarketList(
     val id: Int = 0,
     val name: String,
     val searcher: AllSupermarketSearcher,
-)
+){
+    constructor(info: SupermarketListInfo): this(
+        info.id,
+        info.name,
+        info.searcher
+    )
+}
 
 data class SupermarketListInfo(
     val id: Int = 0,
     val name: String,
     val searcher: AllSupermarketSearcher,
-    val totalPrice: Double
+    val totalPrice: Double,
+    val totalProducts: Int
 )

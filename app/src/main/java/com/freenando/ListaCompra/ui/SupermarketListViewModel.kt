@@ -35,6 +35,12 @@ class SupermarketListViewModel(private val repository: EntriesRepository): ViewM
         }
     }
 
+    fun deleteList(list: SupermarketList){
+        viewModelScope.launch {
+            repository.deleteSupermarketList(list)
+        }
+    }
+
     companion object {
         private const val TIMEOUT_MILIS = 5_000L
     }
