@@ -36,6 +36,7 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.ShoppingCart
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Card
@@ -191,6 +192,28 @@ fun AppInfoBox(appInfo: AppInfo,
                     )
                     Text(
                         text = stringResource(R.string.err_network),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    )
+
+                }
+            }
+        else if (appInfo == AppInfo.NOT_FOUND)
+            Card(
+                colors = CardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurface
+                )
+            ) {
+                Row (verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Rounded.Search,
+                        contentDescription = stringResource(R.string.ic_error),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    )
+                    Text(
+                        text = stringResource(R.string.product_not_found),
                         modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
                     )
 

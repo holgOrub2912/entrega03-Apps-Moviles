@@ -13,7 +13,7 @@ class OlimpicaSearcher: SupermarketSearcher {
     @DrawableRes
     override fun getSupermarketImageRes(): Int = R.drawable.olimpica
 
-    override suspend fun searchByEAN(ean: String): Product {
+    override suspend fun searchByEAN(ean: String): Product? {
         val apolloClient = ApolloClient.Builder()
             .serverUrl("https://www.olimpica.com/_v/segment/graphql/v1")
             .build();
@@ -22,10 +22,13 @@ class OlimpicaSearcher: SupermarketSearcher {
             .query(ProductByEANQuery(ean = ean))
             .execute()
 
-        if (response.data != null && response.data!!.product != null)
-            return Product(response.data!!.product!!)
-        else
+        if (response.data == null)
             throw IllegalArgumentException(ean)
+
+        if (response.data!!.product == null)
+            return null
+
+        return Product(response.data!!.product!!)
     }
 
 }

@@ -7,5 +7,5 @@ interface SupermarketSearcher {
     @DrawableRes
     fun getSupermarketImageRes(): Int
     fun getSupermarketName(): String
-    suspend fun searchByEAN(ean: String): Product
+    suspend fun searchByEAN(ean: String): Product?
 }

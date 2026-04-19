@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -77,10 +78,16 @@ fun ComparePriceScreen(
     val uiState by produceState(key1 = ean, key2 = searchers, initialValue = ProductComparisonUiState(
         ProductComparisonInfo.LOADING)){
         try {
-            value = ProductComparisonUiState(info = ProductComparisonInfo.DONE,searchers
+            val productPairs = searchers
                 .distinctBy { it.searcher.getSupermarketName() }
                 .map { Pair(it.searcher, it.searcher.searchByEAN(ean)) }
-                .toList())
+                .filter { it.second != null }
+                .toList() as List<Pair<SupermarketSearcher, Product>>
+
+            if (productPairs.isEmpty())
+                value = ProductComparisonUiState(info = ProductComparisonInfo.NONE_FOUND)
+            else
+                value = ProductComparisonUiState(info = ProductComparisonInfo.DONE, list = productPairs)
         } catch (e: Exception) {
             value = ProductComparisonUiState(info = ProductComparisonInfo.ERROR)
         }
@@ -92,6 +99,27 @@ fun ComparePriceScreen(
             ).fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally) {
         when {
+            uiState.info == ProductComparisonInfo.NONE_FOUND -> Card(
+                colors = CardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurface
+                )
+            ) {
+                Row (verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Rounded.Search,
+                        contentDescription = stringResource(R.string.ic_error),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    )
+                    Text(
+                        text = stringResource(R.string.product_not_found),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    )
+
+                }
+            }
             uiState.info == ProductComparisonInfo.LOADING || (uiState.info != ProductComparisonInfo.ERROR && uiState.isEmpty()) -> CircularProgressIndicator(
                 modifier = Modifier.size(48.dp)
                     .padding(top = 50.dp),

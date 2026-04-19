@@ -67,7 +67,7 @@ class ExitoSearcher: SupermarketSearcher {
     @DrawableRes
     override fun getSupermarketImageRes(): Int = R.drawable.exito
 
-    override suspend fun searchByEAN(ean: String): Product {
+    override suspend fun searchByEAN(ean: String): Product? {
         val defaultJson = Json {
             encodeDefaults = true
             ignoreUnknownKeys = true
@@ -82,6 +82,10 @@ class ExitoSearcher: SupermarketSearcher {
         val stringVars = defaultJson.encodeToString(QueryVariables(term = ean))
 
         val result = service.queryProduct(stringVars).await()
+
+        if (result.data.search.suggestions.products.isEmpty())
+            return null
+
         return Product(
             id = result.data.search.suggestions.products[0].id,
             name = result.data.search.suggestions.products[0].name,

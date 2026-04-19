@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
     val container: AppContainer = AppDataContainer(this)
     
     private val currencyFormatter = NumberFormat.getCurrencyInstance()
-    lateinit var scanProductAction: (String) -> Unit
+    var scanProductAction: (String) -> Unit = {}
     private lateinit var compareAction: (String) -> Unit
 
     private val barcodeLauncher =
@@ -77,6 +77,7 @@ class MainActivity : ComponentActivity() {
         compareBarcodeLauncher.launch(ScanOptions()
             .setOrientationLocked(true)
             .setPrompt(resources.getString(R.string.scan_prompt)))
+
     }
 
 

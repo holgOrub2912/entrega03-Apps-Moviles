@@ -18,6 +18,7 @@ enum class AppInfo {
     AWAITING_INPUT,
     LOADING,
     NETWORK_ERROR,
+    NOT_FOUND
 }
 
 class GroceryListViewModel(private val supermarketListId: Int, private val entriesRepository: EntriesRepository) : ViewModel() {
@@ -40,6 +41,12 @@ class GroceryListViewModel(private val supermarketListId: Int, private val entri
                     { supermarketList ->
                         _appInfo.value = AppInfo.LOADING
                         val product = supermarketList!!.searcher.searchByEAN(ean)
+
+                        if (product == null){
+                            _appInfo.value = AppInfo.NOT_FOUND
+                            return@collect
+                        }
+
                         if (uiState.value.productAlreadyAdded(product.id))
                             toggleAddedToCart(product.id)
                         else

@@ -13,6 +13,7 @@
     <string name="label_total">Total</string>
     <string name="err_network">No se ha podido conectar a internet. Revisa tu conexión.</string>
     <string name="ic_error">Error icon</string>
+    <string name="ic_not_found">Search icon</string>
     <string name="add_supermarket_list">Añadir nueva lista de supermercado</string>
     <string name="compare_price">Comparar precios</string>
     <string name="delete_list">Eliminar lista de compra</string>
@@ -25,4 +26,5 @@
     <string name="add_supermarket_list_btn">Confirmar</string>
     <string name="navigate_back_main_menu">De vuelta al menú principal</string>
     <string name="add_product_to_list">Añadir producto a una lista</string>
+    <string name="product_not_found">Producto no encontrado</string>
 </resources>

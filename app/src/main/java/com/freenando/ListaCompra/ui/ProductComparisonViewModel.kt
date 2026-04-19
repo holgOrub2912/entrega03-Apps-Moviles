@@ -15,6 +15,7 @@ enum class ProductComparisonInfo {
     LOADING,
     DONE,
     ERROR,
+    NONE_FOUND,
 }
 
 data class ProductComparisonUiState(
