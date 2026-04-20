@@ -86,17 +86,6 @@ fun ProductListScreen(supermarketListId: Int, context: MainActivity, newProductE
         groceryListViewModel.addProduct(it)
     }
 
-    Surface(
-        modifier = modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(
-                start = WindowInsets.safeDrawing.asPaddingValues()
-                    .calculateStartPadding(layoutDirection),
-                end = WindowInsets.safeDrawing.asPaddingValues()
-                    .calculateEndPadding(layoutDirection),
-            ),
-    ){
         Scaffold(
             topBar = {
                 Row(
@@ -145,7 +134,8 @@ fun ProductListScreen(supermarketListId: Int, context: MainActivity, newProductE
         ) { innerPadding ->
             Column(
                 modifier = Modifier
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium)),
             ){
                 ProductList(
@@ -160,7 +150,6 @@ fun ProductListScreen(supermarketListId: Int, context: MainActivity, newProductE
                 AppInfoBox(appInfo = appInfo)
             }
         }
-    }
 }
 
 @Composable
