@@ -62,6 +62,7 @@ import com.freenando.ListaCompra.data.SupermarketListInfo
 import com.freenando.ListaCompra.search.AllSupermarketSearcher
 import com.freenando.ListaCompra.search.SupermarketSearcher
 import com.freenando.ListaCompra.ui.theme.CompraListaTheme
+import java.net.UnknownHostException
 import java.text.NumberFormat
 import kotlin.math.exp
 
@@ -78,56 +79,33 @@ fun ComparePriceScreen(
     val uiState by produceState(key1 = ean, key2 = searchers, initialValue = ProductComparisonUiState(
         ProductComparisonInfo.LOADING)){
         try {
+            if (searchers.isEmpty())
+                return@produceState
             val productPairs = searchers
                 .distinctBy { it.searcher.getSupermarketName() }
                 .map { Pair(it.searcher, it.searcher.searchByEAN(ean)) }
                 .filter { it.second != null }
-                .toList() as List<Pair<SupermarketSearcher, Product>>
+                .toList()
+                .let {
+                    value = ProductComparisonUiState(
+                        info = ProductComparisonInfo.DONE,
+                        list = it as List<Pair<SupermarketSearcher, Product>>
+                    )
+                }
 
-            if (productPairs.isEmpty())
-                value = ProductComparisonUiState(info = ProductComparisonInfo.NONE_FOUND)
-            else
-                value = ProductComparisonUiState(info = ProductComparisonInfo.DONE, list = productPairs)
-        } catch (e: Exception) {
-            value = ProductComparisonUiState(info = ProductComparisonInfo.ERROR)
+        } catch (e: UnknownHostException) {
+            value = ProductComparisonUiState(info = ProductComparisonInfo.DONE)
         }
     }
 
-    Column (modifier = modifier.padding(
+    Column (modifier = modifier
+        .padding(
             vertical = dimensionResource(R.dimen.padding_small),
             horizontal = dimensionResource(R.dimen.padding_small)
-            ).fillMaxSize(),
+        )
+        .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally) {
-        when {
-            uiState.info == ProductComparisonInfo.NONE_FOUND -> Card(
-                colors = CardColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary,
-                    disabledContainerColor = MaterialTheme.colorScheme.surface,
-                    disabledContentColor = MaterialTheme.colorScheme.onSurface
-                )
-            ) {
-                Row (verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Rounded.Search,
-                        contentDescription = stringResource(R.string.ic_error),
-                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
-                    )
-                    Text(
-                        text = stringResource(R.string.product_not_found),
-                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
-                    )
-
-                }
-            }
-            uiState.info == ProductComparisonInfo.LOADING || (uiState.info != ProductComparisonInfo.ERROR && uiState.isEmpty()) -> CircularProgressIndicator(
-                modifier = Modifier.size(48.dp)
-                    .padding(top = 50.dp),
-                color = MaterialTheme.colorScheme.secondary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-
-            uiState.info == ProductComparisonInfo.DONE && !uiState.isEmpty() -> ComparePriceList(
+            ComparePriceList(
                 ean,
                 uiState,
                 searchers,
@@ -135,8 +113,57 @@ fun ComparePriceScreen(
                 onNavBack = onNavBack,
                 modifier = Modifier,
             )
+        }
+}
 
-            uiState.info == ProductComparisonInfo.ERROR -> Card(
+@Composable
+fun ComparePriceList(
+    ean: String,
+    productPairs: ProductComparisonUiState,
+    searchers: List<SupermarketListInfo>,
+    onAddToList: (String, Int) -> Unit,
+    onNavBack: () -> Unit,
+    modifier: Modifier = Modifier,
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(dimensionResource(R.dimen.padding_small)),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = dimensionResource(R.dimen.padding_small))
+        ) {
+            IconButton(
+                onClick = onNavBack,
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .width(70.dp)
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Default.ArrowBack,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    contentDescription = stringResource(R.string.navigate_back_main_menu),
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(40.dp))
+        when {
+            productPairs.info == ProductComparisonInfo.LOADING -> CircularProgressIndicator(
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(top = 50.dp),
+                color = MaterialTheme.colorScheme.secondary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+
+            productPairs.info == ProductComparisonInfo.DONE && productPairs.list == null -> Card(
                 colors = CardColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.onErrorContainer,
@@ -157,122 +184,131 @@ fun ComparePriceScreen(
 
                 }
             }
-        }
-    }
-}
 
-@Composable
-fun ComparePriceList(
-    ean: String,
-    productPairs: ProductComparisonUiState,
-    searchers: List<SupermarketListInfo>,
-    onAddToList: (String, Int) -> Unit,
-    onNavBack: () -> Unit,
-    modifier: Modifier = Modifier,
-){
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(dimensionResource(R.dimen.padding_small))
-    ) {
-        Row (
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(R.dimen.padding_small))
-        ) {
-            IconButton (
-                onClick = onNavBack,
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .width(70.dp)
-            ) {
-                Icon(
-                    Icons.AutoMirrored.Default.ArrowBack,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    contentDescription = stringResource(R.string.navigate_back_main_menu),
+            productPairs.info == ProductComparisonInfo.DONE && productPairs.list!!.isEmpty() -> Card(
+                colors = CardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurface
                 )
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Rounded.Search,
+                        contentDescription = stringResource(R.string.ic_error),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    )
+                    Text(
+                        text = stringResource(R.string.product_not_found),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    )
+
+                }
             }
-        }
-        Spacer(modifier = Modifier.height(40.dp))
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            items(productPairs.list, key = {Pair(it.first.getSupermarketName(), it.second.id.toString())}){pair ->
-                Column (
-                    modifier = Modifier
-                        .animateItem(
-                            fadeInSpec = tween(durationMillis = 250),
-                            fadeOutSpec = tween(durationMillis = 250),
-                            placementSpec = spring(stiffness = Spring.StiffnessLow, dampingRatio = Spring.DampingRatioLowBouncy)
+
+
+            productPairs.info == ProductComparisonInfo.DONE && productPairs.list!!.isNotEmpty() -> LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                items(
+                    productPairs.list,
+                    key = {
+                        Pair(
+                            it.first.getSupermarketName(),
+                            it.second.id.toString()
                         )
-                ) {
-                    Card(
+                    }) { pair ->
+                    Column(
                         modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(dimensionResource(R.dimen.padding_small))
-                        ) {
-                            val matchingSupermarketLists = searchers
-                                .filter {it.searcher.getSupermarketName() == pair.first.getSupermarketName()}
-                            var listDropdownVisible by remember { mutableStateOf(false) }
-                            Column (
-                                modifier = Modifier
-                                    .fillMaxWidth(0.7f)
-                            ) {
-                                Text(pair.second.name, fontSize = 14.sp)
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(currencyFormatter.format(pair.second.price), fontSize = 18.sp)
-                            }
-                            Row {
-                                Image(
-                                    painter = painterResource(pair.first.getSupermarketImageRes()),
-                                    contentDescription = pair.first.getSupermarketName(),
-                                    modifier = Modifier
-                                        .size(50.dp)
-                                        .clip(shape = MaterialTheme.shapes.small)
-                                        .padding(end = 4.dp)
+                            .animateItem(
+                                fadeInSpec = tween(durationMillis = 250),
+                                fadeOutSpec = tween(durationMillis = 250),
+                                placementSpec = spring(
+                                    stiffness = Spring.StiffnessLow,
+                                    dampingRatio = Spring.DampingRatioLowBouncy
                                 )
-                                Column {
-                                    IconButton (
-                                        onClick = { if (matchingSupermarketLists.size == 1) onAddToList(ean, matchingSupermarketLists[0].id) else listDropdownVisible = true },
-                                        modifier = modifier
-                                            .background(color = MaterialTheme.colorScheme.primary,
-                                                shape = MaterialTheme.shapes.small)
+                            )
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(dimensionResource(R.dimen.padding_small))
+                            ) {
+                                val matchingSupermarketLists = searchers
+                                    .filter { it.searcher.getSupermarketName() == pair.first.getSupermarketName() }
+                                var listDropdownVisible by remember { mutableStateOf(false) }
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.7f)
+                                ) {
+                                    Text(pair.second.name, fontSize = 14.sp)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        currencyFormatter.format(pair.second.price),
+                                        fontSize = 18.sp
+                                    )
+                                }
+                                Row {
+                                    Image(
+                                        painter = painterResource(pair.first.getSupermarketImageRes()),
+                                        contentDescription = pair.first.getSupermarketName(),
+                                        modifier = Modifier
                                             .size(50.dp)
-                                    ){
-                                        Icon(
-                                            Icons.Rounded.Add,
-                                            tint = MaterialTheme.colorScheme.onPrimary,
-                                            contentDescription = stringResource(R.string.add_product_to_list)
-                                        )
-                                    }
-                                    DropdownMenu(
-                                        expanded = listDropdownVisible,
-                                        modifier = Modifier,
-                                        onDismissRequest = { listDropdownVisible = false }
-                                    ) {
-                                        matchingSupermarketLists.map {supermarketListInfo ->
-                                            DropdownMenuItem(
-                                                modifier = Modifier,
-                                                text = {Text(supermarketListInfo.name)},
-                                                onClick = {onAddToList(ean, supermarketListInfo.id)}
+                                            .clip(shape = MaterialTheme.shapes.small)
+                                            .padding(end = 4.dp)
+                                    )
+                                    Column {
+                                        IconButton(
+                                            onClick = {
+                                                if (matchingSupermarketLists.size == 1) onAddToList(
+                                                    ean,
+                                                    matchingSupermarketLists[0].id
+                                                ) else listDropdownVisible = true
+                                            },
+                                            modifier = modifier
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    shape = MaterialTheme.shapes.small
+                                                )
+                                                .size(50.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Rounded.Add,
+                                                tint = MaterialTheme.colorScheme.onPrimary,
+                                                contentDescription = stringResource(R.string.add_product_to_list)
                                             )
+                                        }
+                                        DropdownMenu(
+                                            expanded = listDropdownVisible,
+                                            modifier = Modifier,
+                                            onDismissRequest = { listDropdownVisible = false }
+                                        ) {
+                                            matchingSupermarketLists.map { supermarketListInfo ->
+                                                DropdownMenuItem(
+                                                    modifier = Modifier,
+                                                    text = { Text(supermarketListInfo.name) },
+                                                    onClick = {
+                                                        onAddToList(
+                                                            ean,
+                                                            supermarketListInfo.id
+                                                        )
+                                                    }
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
         }

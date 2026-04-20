@@ -14,13 +14,9 @@ import kotlin.collections.map
 enum class ProductComparisonInfo {
     LOADING,
     DONE,
-    ERROR,
-    NONE_FOUND,
 }
 
 data class ProductComparisonUiState(
     val info: ProductComparisonInfo,
-    val list: List<Pair<SupermarketSearcher, Product>> = listOf(),
-){
-    fun isEmpty(): Boolean = list.isEmpty()
-}
+    val list: List<Pair<SupermarketSearcher, Product>>? = null,
+)
