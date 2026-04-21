@@ -92,7 +92,7 @@ fun ProductListScreen(supermarketListId: Int, context: MainActivity, newProductE
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .padding(top = 30.dp, bottom = 40.dp, start = 20.dp, end = 20.dp)
+                        .padding(top = 30.dp, bottom = 10.dp, start = 20.dp, end = 20.dp)
                         .fillMaxWidth()
                 ) {
                     supermarketListUiState?.let { Text(it.name) }
@@ -118,7 +118,12 @@ fun ProductListScreen(supermarketListId: Int, context: MainActivity, newProductE
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .padding(vertical = 30.dp, horizontal = 20.dp)
+                        .padding(
+                            top = 10.dp,
+                            bottom = 30.dp,
+                            start = 20.dp,
+                            end = 20.dp,
+                        )
                         .fillMaxWidth()
                 ) {
                     TotalPriceBox(
