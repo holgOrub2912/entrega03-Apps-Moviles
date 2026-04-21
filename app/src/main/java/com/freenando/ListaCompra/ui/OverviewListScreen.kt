@@ -124,6 +124,7 @@ fun SupermarketLists(
     onNavigateToAboutUs: () -> Unit,
     modifier: Modifier = Modifier
 ){
+    val globalTotalPrice = supermarketLists.sumOf { it.totalPrice }
 
     Scaffold(
         modifier = modifier
@@ -162,19 +163,26 @@ fun SupermarketLists(
                         start = 10.dp,
                         end = 10.dp,
                     ),
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                NavigateToAboutUsBtn(
-                    onClick = onNavigateToAboutUs,
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
+                Text(
+                    text = "${stringResource(R.string.label_total)}: ${currencyFormatter.format(globalTotalPrice)}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
                 )
-                NavigateToNewListScreenBtn(
-                    onClick = onNavigateToNewList,
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                )
+                Row {
+                    NavigateToAboutUsBtn(
+                        onClick = onNavigateToAboutUs,
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                    )
+                    NavigateToNewListScreenBtn(
+                        onClick = onNavigateToNewList,
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                    )
+                }
             }
         }) {innerPadding ->
         Column(
