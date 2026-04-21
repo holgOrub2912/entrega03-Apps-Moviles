@@ -125,12 +125,46 @@ fun SupermarketLists(
     modifier: Modifier = Modifier
 ){
 
-    Column(
+    Scaffold(
         modifier = modifier
-            .padding(dimensionResource(R.dimen.padding_small))
-    ) {
-        Scaffold(floatingActionButton = {
-            Row(modifier = Modifier) {
+            .padding(horizontal = 8.dp),
+        topBar = {
+            Row (
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 30.dp, bottom = 50.dp, start = 10.dp, end = 10.dp)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_launcher),
+                    contentDescription = stringResource(R.string.app_logo_description),
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .size(50.dp)
+                )
+                if (supermarketLists.size > 0)
+                    Button(
+                        onClick = onNavigateToCompare,
+                        shape = MaterialTheme.shapes.small,
+                        modifier = Modifier
+                            .height(50.dp)
+                    ) { Text(stringResource(R.string.compare_price)) }
+            }
+        },
+        bottomBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = 10.dp,
+                        bottom = 30.dp,
+                        start = 10.dp,
+                        end = 10.dp,
+                    ),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 NavigateToAboutUsBtn(
                     onClick = onNavigateToAboutUs,
                     modifier = Modifier
@@ -143,113 +177,98 @@ fun SupermarketLists(
                 )
             }
         }) {innerPadding ->
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource( if (supermarketLists.size > 1) R.string.overview else R.string.no_supermarketlists_found_help),
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                Row (
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 50.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_launcher),
-                        contentDescription = stringResource(R.string.app_logo_description),
+                    .padding(vertical = 30.dp)
+                    .fillMaxWidth(0.9f)
+            )
+            LazyColumn {
+                items(supermarketLists, key = {it.id}){supermarketList ->
+                    Button(
+                        onClick = { onNavigateToExistingList(supermarketList.id) },
+                        shape = MaterialTheme.shapes.medium,
+                        colors = ButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                            disabledContainerColor = MaterialTheme.colorScheme.onError,
+                            disabledContentColor = MaterialTheme.colorScheme.onError
+                        ),
                         modifier = Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .size(50.dp)
-                    )
-                    if (supermarketLists.size > 0)
-                        Button(
-                            onClick = onNavigateToCompare,
-                            shape = MaterialTheme.shapes.small,
-                            modifier = Modifier
-                                .height(50.dp)
-                        ) { Text(stringResource(R.string.compare_price)) }
-                }
-                LazyColumn {
-                    items(supermarketLists, key = {it.id}){supermarketList ->
-                        Button(
-                            onClick = { onNavigateToExistingList(supermarketList.id) },
-                            shape = MaterialTheme.shapes.medium,
-                            colors = ButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                                disabledContainerColor = MaterialTheme.colorScheme.onError,
-                                disabledContentColor = MaterialTheme.colorScheme.onError
-                            ),
+                            .fillMaxWidth()
+                    ) {
+                        Row (
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier
                                 .fillMaxWidth()
-                        ) {
-                            Row (
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                        ){
+                            Column(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                            ){
-                                Column(
+                            ) {
+                                Text(
+                                    supermarketList.name,
+                                    fontSize = 20.sp,
+                                    softWrap = true,
                                     modifier = Modifier
-                                ) {
+                                        .padding(vertical = 8.dp)
+                                        .fillMaxWidth(0.7f)
+                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.End,
+                                    modifier = Modifier
+                                ){
                                     Text(
-                                        supermarketList.name,
-                                        fontSize = 20.sp,
-                                        softWrap = true,
-                                        modifier = Modifier
-                                            .padding(vertical = 8.dp)
-                                            .fillMaxWidth(0.7f)
+                                        "${supermarketList.totalProducts.toString()} ${stringResource(if (supermarketList.totalProducts == 1) R.string.products_qty_indicator_singular else R.string.products_qty_indicator_plural)}",
+                                        fontSize = 16.sp
                                     )
-                                    Row(
-                                        horizontalArrangement = Arrangement.End,
-                                        modifier = Modifier
-                                    ){
-                                        Text(
-                                            "${supermarketList.totalProducts.toString()} ${stringResource(if (supermarketList.totalProducts == 1) R.string.products_qty_indicator_singular else R.string.products_qty_indicator_plural)}",
-                                            fontSize = 16.sp
-                                        )
-                                        Spacer(modifier = Modifier.width(30.dp))
-                                        Text(
-                                            currencyFormatter.format(supermarketList.totalPrice),
-                                            fontSize = 16.sp
-                                        )
-                                    }
-                                }
-                                Row (modifier = Modifier.width(IntrinsicSize.Min)) {
-                                    Image(
-                                        painter = painterResource(supermarketList.searcher.getSupermarketImageRes()),
-                                        contentDescription = supermarketList.searcher.getSupermarketName(),
-                                        modifier = Modifier
-                                            .size(50.dp)
-                                            .clip(shape = MaterialTheme.shapes.small)
-                                            .padding(end = 4.dp)
+                                    Spacer(modifier = Modifier.width(30.dp))
+                                    Text(
+                                        currencyFormatter.format(supermarketList.totalPrice),
+                                        fontSize = 16.sp
                                     )
-                                    if (supermarketList.totalProducts == 0)
-                                        IconButton(
-                                            onClick = { onDeleteList(SupermarketList(supermarketList)) },
-                                            modifier = modifier
-                                                .background(
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                    shape = MaterialTheme.shapes.small
-                                                )
-                                                .size(50.dp)
-                                        ) {
-                                            Icon(
-                                                Icons.Rounded.Delete,
-                                                tint = MaterialTheme.colorScheme.onPrimary,
-                                                contentDescription =  stringResource(R.string.delete_list)
-                                            )
-                                        }
                                 }
                             }
+                            Row (modifier = Modifier.width(IntrinsicSize.Min)) {
+                                Image(
+                                    painter = painterResource(supermarketList.searcher.getSupermarketImageRes()),
+                                    contentDescription = supermarketList.searcher.getSupermarketName(),
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .clip(shape = MaterialTheme.shapes.small)
+                                        .padding(end = 4.dp)
+                                )
+                                if (supermarketList.totalProducts == 0)
+                                    IconButton(
+                                        onClick = { onDeleteList(SupermarketList(supermarketList)) },
+                                        modifier = modifier
+                                            .background(
+                                                color = MaterialTheme.colorScheme.primary,
+                                                shape = MaterialTheme.shapes.small
+                                            )
+                                            .size(50.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Rounded.Delete,
+                                            tint = MaterialTheme.colorScheme.onPrimary,
+                                            contentDescription =  stringResource(R.string.delete_list)
+                                        )
+                                    }
+                            }
                         }
-                        Spacer(modifier = Modifier.height(10.dp))
                     }
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
         }
     }
-
 }
 
 @Preview

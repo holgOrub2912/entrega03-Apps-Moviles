@@ -52,9 +52,11 @@ import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.room.util.TableInfo
 import com.freenando.ListaCompra.R
 import com.freenando.ListaCompra.data.Product
 import com.freenando.ListaCompra.data.ProductEntry
@@ -135,7 +137,7 @@ fun ComparePriceList(
             horizontalArrangement = Arrangement.End,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = dimensionResource(R.dimen.padding_small))
+                .padding(top = 14.dp)
         ) {
             IconButton(
                 onClick = onNavBack,
@@ -153,7 +155,7 @@ fun ComparePriceList(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         when {
             productPairs.info == ProductComparisonInfo.LOADING -> CircularProgressIndicator(
                 modifier = Modifier
@@ -208,107 +210,125 @@ fun ComparePriceList(
             }
 
 
-            productPairs.info == ProductComparisonInfo.DONE && productPairs.list!!.isNotEmpty() -> LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                items(
-                    productPairs.list,
-                    key = {
-                        Pair(
-                            it.first.getSupermarketName(),
-                            it.second.id.toString()
-                        )
-                    }) { pair ->
-                    Column(
+            productPairs.info == ProductComparisonInfo.DONE && productPairs.list!!.isNotEmpty() ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.product_found_on)
+                                + " " + stringResource(
+                                if (productPairs.list.size > 1)
+                                        R.string.supermarkets_plural
+                                    else
+                                        R.string.supermarkets_singular
+                                ),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
                         modifier = Modifier
-                            .animateItem(
-                                fadeInSpec = tween(durationMillis = 250),
-                                fadeOutSpec = tween(durationMillis = 250),
-                                placementSpec = spring(
-                                    stiffness = Spring.StiffnessLow,
-                                    dampingRatio = Spring.DampingRatioLowBouncy
-                                )
-                            )
+                            .padding(vertical = 30.dp)
+                    )
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
                     ) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxSize()
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                        items(
+                            productPairs.list,
+                            key = {
+                                Pair(
+                                    it.first.getSupermarketName(),
+                                    it.second.id.toString()
+                                )
+                            }) { pair ->
+                            Column(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(dimensionResource(R.dimen.padding_small))
+                                    .animateItem(
+                                        fadeInSpec = tween(durationMillis = 250),
+                                        fadeOutSpec = tween(durationMillis = 250),
+                                        placementSpec = spring(
+                                            stiffness = Spring.StiffnessLow,
+                                            dampingRatio = Spring.DampingRatioLowBouncy
+                                        )
+                                    )
                             ) {
-                                val matchingSupermarketLists = searchers
-                                    .filter { it.searcher.getSupermarketName() == pair.first.getSupermarketName() }
-                                var listDropdownVisible by remember { mutableStateOf(false) }
-                                Column(
+                                Card(
                                     modifier = Modifier
-                                        .fillMaxWidth(0.7f)
+                                        .fillMaxSize()
                                 ) {
-                                    Text(pair.second.name, fontSize = 14.sp)
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        currencyFormatter.format(pair.second.price),
-                                        fontSize = 18.sp
-                                    )
-                                }
-                                Row {
-                                    Image(
-                                        painter = painterResource(pair.first.getSupermarketImageRes()),
-                                        contentDescription = pair.first.getSupermarketName(),
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween,
                                         modifier = Modifier
-                                            .size(50.dp)
-                                            .clip(shape = MaterialTheme.shapes.small)
-                                            .padding(end = 4.dp)
-                                    )
-                                    Column {
-                                        IconButton(
-                                            onClick = {
-                                                if (matchingSupermarketLists.size == 1) onAddToList(
-                                                    ean,
-                                                    matchingSupermarketLists[0].id
-                                                ) else listDropdownVisible = true
-                                            },
-                                            modifier = modifier
-                                                .background(
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                    shape = MaterialTheme.shapes.small
-                                                )
-                                                .size(50.dp)
+                                            .fillMaxWidth()
+                                            .padding(dimensionResource(R.dimen.padding_small))
+                                    ) {
+                                        val matchingSupermarketLists = searchers
+                                            .filter { it.searcher.getSupermarketName() == pair.first.getSupermarketName() }
+                                        var listDropdownVisible by remember { mutableStateOf(false) }
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth(0.7f)
                                         ) {
-                                            Icon(
-                                                Icons.Rounded.Add,
-                                                tint = MaterialTheme.colorScheme.onPrimary,
-                                                contentDescription = stringResource(R.string.add_product_to_list)
+                                            Text(pair.second.name, fontSize = 14.sp)
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                currencyFormatter.format(pair.second.price),
+                                                fontSize = 18.sp
                                             )
                                         }
-                                        DropdownMenu(
-                                            expanded = listDropdownVisible,
-                                            modifier = Modifier,
-                                            onDismissRequest = { listDropdownVisible = false }
-                                        ) {
-                                            matchingSupermarketLists.map { supermarketListInfo ->
-                                                DropdownMenuItem(
-                                                    modifier = Modifier,
-                                                    text = { Text(supermarketListInfo.name) },
+                                        Row {
+                                            Image(
+                                                painter = painterResource(pair.first.getSupermarketImageRes()),
+                                                contentDescription = pair.first.getSupermarketName(),
+                                                modifier = Modifier
+                                                    .size(50.dp)
+                                                    .clip(shape = MaterialTheme.shapes.small)
+                                                    .padding(end = 4.dp)
+                                            )
+                                            Column {
+                                                IconButton(
                                                     onClick = {
-                                                        onAddToList(
+                                                        if (matchingSupermarketLists.size == 1) onAddToList(
                                                             ean,
-                                                            supermarketListInfo.id
+                                                            matchingSupermarketLists[0].id
+                                                        ) else listDropdownVisible = true
+                                                    },
+                                                    modifier = modifier
+                                                        .background(
+                                                            color = MaterialTheme.colorScheme.primary,
+                                                            shape = MaterialTheme.shapes.small
+                                                        )
+                                                        .size(50.dp)
+                                                ) {
+                                                    Icon(
+                                                        Icons.Rounded.Add,
+                                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                                        contentDescription = stringResource(R.string.add_product_to_list)
+                                                    )
+                                                }
+                                                DropdownMenu(
+                                                    expanded = listDropdownVisible,
+                                                    modifier = Modifier,
+                                                    onDismissRequest = { listDropdownVisible = false }
+                                                ) {
+                                                    matchingSupermarketLists.map { supermarketListInfo ->
+                                                        DropdownMenuItem(
+                                                            modifier = Modifier,
+                                                            text = { Text(supermarketListInfo.name) },
+                                                            onClick = {
+                                                                onAddToList(
+                                                                    ean,
+                                                                    supermarketListInfo.id
+                                                                )
+                                                            }
                                                         )
                                                     }
-                                                )
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
+                                Spacer(modifier = Modifier.height(10.dp))
                         }
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
                 }
             }
         }

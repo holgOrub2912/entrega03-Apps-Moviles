@@ -4,6 +4,7 @@
     <string name="scan_prompt">Escanee el código de barras del producto</string>
     <string name="desc_btn_scan">Escanear código de barras</string>
     <string name="desc_btn_add_to_cart">Añadir al carrito</string>
+    <string name="overview">Listas de compra</string>
     <string name="desc_btn_delete">Eliminar producto</string>
     <string name="label_product_price">Precio de producto</string>
     <string name="desc_btn_dec_qty">Decrementar cantidad de producto</string>
@@ -30,4 +31,8 @@
     <string name="add_product_to_list">Añadir producto a una lista</string>
     <string name="product_not_found">Producto no encontrado</string>
     <string name="app_logo_description">CompraLista logo</string>
+    <string name="product_found_on">Encontrado en</string>
+    <string name="supermarkets_singular">supermercados</string>
+    <string name="supermarkets_plural">supermercados</string>
+    <string name="no_supermarketlists_found_help">No hay listas de compra creadas. Crea una nueva pulsando el botón "+"</string>
 </resources>
