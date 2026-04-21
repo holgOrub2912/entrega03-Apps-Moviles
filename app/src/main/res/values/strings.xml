@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">CompraLista</string>
+    <string name="app_description">CompraLista es una aplicación con la cual puedes planear tus compras en varios supermercados de manera fácil y rápida. Escanea los codigos de barras, obtén el precio total de tu compra en todo momento y compara precios entre varios supermercados.</string>
     <string name="scan_prompt">Escanee el código de barras del producto</string>
     <string name="desc_btn_scan">Escanear código de barras</string>
     <string name="desc_btn_add_to_cart">Añadir al carrito</string>
@@ -16,6 +17,7 @@
     <string name="ic_not_found">Search icon</string>
     <string name="add_supermarket_list">Añadir nueva lista de supermercado</string>
     <string name="compare_price">Comparar precios</string>
+    <string name="about_us">Sobre Nosotros</string>
     <string name="delete_list">Eliminar lista de compra</string>
     <string name="supermarket_list">Productos en Lista</string>
     <string name="desc_btn_goto_list">Ir a lista de compra</string>
@@ -27,4 +29,5 @@
     <string name="navigate_back_main_menu">De vuelta al menú principal</string>
     <string name="add_product_to_list">Añadir producto a una lista</string>
     <string name="product_not_found">Producto no encontrado</string>
+    <string name="app_logo_description">CompraLista logo</string>
 </resources>

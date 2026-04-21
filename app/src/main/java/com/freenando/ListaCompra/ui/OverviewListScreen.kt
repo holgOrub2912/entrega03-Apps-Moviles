@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -149,15 +150,24 @@ fun SupermarketLists(
             ) {
                 Row (
                     horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 50.dp)
                 ) {
-                    /// TODO: Logo should go here
+                    Image(
+                        painter = painterResource(R.drawable.ic_launcher),
+                        contentDescription = stringResource(R.string.app_logo_description),
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .size(50.dp)
+                    )
                     if (supermarketLists.size > 0)
                         Button(
                             onClick = onNavigateToCompare,
-                            shape = MaterialTheme.shapes.small
+                            shape = MaterialTheme.shapes.small,
+                            modifier = Modifier
+                                .height(50.dp)
                         ) { Text(stringResource(R.string.compare_price)) }
                 }
                 LazyColumn {
