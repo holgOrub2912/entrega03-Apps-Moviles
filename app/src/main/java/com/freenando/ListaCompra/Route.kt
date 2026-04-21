@@ -8,6 +8,7 @@ sealed class AppScreen(val route: String, @StringRes val title: Int){
     data object ComparePrices: AppScreen("compare/{ean}", R.string.compare_price) {
         fun createRoute(ean: String): String = "compare/$ean"
     }
+    data object AboutUs: AppScreen("aboutUs", R.string.about_us)
     data object ProductList: AppScreen("list/{supermarketListId}?newProductEan={ean}", R.string.supermarket_list){
         fun createRoute(supermarketListId: Int): String = "list/$supermarketListId"
         fun createRoute(supermarketListId: Int, newProductEan: String): String = "list/$supermarketListId?newProductEan=$newProductEan"

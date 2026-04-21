@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -75,11 +76,28 @@ fun NavigateToNewListScreenBtn(onClick: () -> Unit, modifier: Modifier = Modifie
 }
 
 @Composable
+fun NavigateToAboutUsBtn(onClick: () -> Unit, modifier: Modifier = Modifier){
+    IconButton(onClick = onClick,
+        modifier = modifier
+            .background(color = MaterialTheme.colorScheme.secondary,
+                shape = MaterialTheme.shapes.small)
+            .size(60.dp)
+    ) {
+        Icon(
+            Icons.Rounded.Info,
+            tint = MaterialTheme.colorScheme.onSecondary,
+            contentDescription = stringResource(R.string.add_supermarket_list),
+        )
+    }
+}
+
+@Composable
 fun OverviewListScreen(repository: EntriesRepository,
                        onNavigateToNewList: () -> Unit,
                        onNavigateToExistingList: (id: Int) -> Unit,
                        onNavigateToCompare: () -> Unit,
                        onDeleteList: (id: SupermarketList) -> Unit,
+                       onNavigateToAboutUs: () -> Unit,
                        modifier: Modifier = Modifier
 ){
     val supermarketLists by repository.getSupermarketListStream().collectAsState(listOf())
@@ -90,6 +108,7 @@ fun OverviewListScreen(repository: EntriesRepository,
         onNavigateToExistingList,
         onNavigateToCompare,
         onDeleteList,
+        onNavigateToAboutUs = onNavigateToAboutUs,
         modifier = modifier
     )
 }
@@ -101,6 +120,7 @@ fun SupermarketLists(
     onNavigateToExistingList: (id: Int) -> Unit,
     onNavigateToCompare: () -> Unit,
     onDeleteList: (list: SupermarketList) -> Unit,
+    onNavigateToAboutUs: () -> Unit,
     modifier: Modifier = Modifier
 ){
 
@@ -110,7 +130,16 @@ fun SupermarketLists(
     ) {
         Scaffold(floatingActionButton = {
             Row(modifier = Modifier) {
-                NavigateToNewListScreenBtn(onClick = onNavigateToNewList)
+                NavigateToAboutUsBtn(
+                    onClick = onNavigateToAboutUs,
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                )
+                NavigateToNewListScreenBtn(
+                    onClick = onNavigateToNewList,
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                )
             }
         }) {innerPadding ->
             Column(
@@ -119,7 +148,7 @@ fun SupermarketLists(
                     .padding(innerPadding)
             ) {
                 Row (
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 50.dp)
@@ -245,6 +274,7 @@ fun SupermarketListsPreview(){
                 onNavigateToNewList = {},
                 onNavigateToExistingList = {_ -> },
                 onDeleteList = {},
+                onNavigateToAboutUs = {},
                 onNavigateToCompare = {}
             )
         }

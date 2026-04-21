@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.freenando.ListaCompra.data.AppContainer
 import com.freenando.ListaCompra.data.AppDataContainer
+import com.freenando.ListaCompra.ui.AboutUsScreen
 import com.freenando.ListaCompra.ui.AddNewListScreen
 import com.freenando.ListaCompra.ui.ComparePriceScreen
 import com.freenando.ListaCompra.ui.GroceryListViewModel
@@ -121,7 +122,14 @@ class MainActivity : ComponentActivity() {
                             navController.navigate(AppScreen.ProductList.createRoute(it))
                         },
                         onNavigateToCompare = { context.compareScanBarcode() },
-                        onDeleteList = { supermarketListViewModel.deleteList(it) }
+                        onNavigateToAboutUs = { navController.navigate(AppScreen.AboutUs.route) },
+                        onDeleteList = { supermarketListViewModel.deleteList(it) },
+                    )
+                }
+                composable(AppScreen.AboutUs.route) {
+                    AboutUsScreen(
+                        onNavBack = {navController.popBackStack()},
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
                 composable(AppScreen.NewList.route) {
